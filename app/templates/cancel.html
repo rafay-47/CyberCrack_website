@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Canceled - CyberCrack{% endblock %}
+
+{% block content %}
+<div class="cyber-section cancel-section">
+    <div class="cancel-icon">✕</div>
+    <h1>Payment Canceled</h1>
+    <p class="cancel-message">Your payment process was canceled. No charges have been made.</p>
+    
+    <div class="options-container">
+        <h3>Would you like to:</h3>
+        <div class="options-buttons">
+            <a href="{{ url_for('main.purchase') }}" class="btn">Try Again</a>
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline">Return to Homepage</a>
+        </div>
+    </div>
+    
+    <div class="help-section">
+        <h3>Need Help?</h3>
+        <p>If you're experiencing issues with the payment process, please contact our support team at <a href="mailto:support@cybercrack.com">support@cybercrack.com</a>.</p>
+    </div>
+</div>
+
+<style>
+    .cancel-section {
+        max-width: 700px;
+        margin: 3rem auto;
+        text-align: center;
+    }
+    
+    .cancel-icon {
+        width: 80px;
+        height: 80px;
+        background-color: rgba(255, 107, 107, 0.2);
+        border-radius: 50%;
+        margin: 0 auto 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #ff6b6b;
+        border: 2px solid #ff6b6b;
+    }
+    
+    .cancel-message {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .options-container {
+        margin: 2rem 0;
+    }
+    
+    .options-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .help-section {
+        background-color: rgba(13, 17, 23, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        text-align: left;
+    }
+    
+    .help-section a {
+        color: var(--neon-blue);
+        text-decoration: none;
+    }
+    
+    .help-section a:hover {
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 576px) {
+        .options-buttons {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}

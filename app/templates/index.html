@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberCrack - AI Security Interview Prep{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="cyber-grid">
+        <div class="matrix-animation"></div>
+    </div>
+    <div class="hero-content">
+        <h1>Master <span class="highlight">Cyber Security</span> Interviews</h1>
+        <p class="hero-subtitle">Real-time AI interview prep with advanced audio capture, Whisper transcription, and GPT-powered feedback</p>
+        <div class="hero-buttons">
+            <a href="#download" class="btn btn-primary">Download Now</a>
+            <a href="#demo" class="btn btn-outline">Watch Demo</a>
+        </div>
+    </div>
+</div>
+
+<section class="cyber-section features-section">
+    <h2>Advanced <span class="highlight">Features</span></h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🎙️</div>
+            <h3>System Audio Capture</h3>
+            <p>Seamlessly records both your voice and system audio for comprehensive interview simulation</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🧠</div>
+            <h3>Whisper AI Transcription</h3>
+            <p>State-of-the-art speech recognition converts your interviews into accurate text in real-time</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <h3>GPT-powered Responses</h3>
+            <p>Get instant feedback and detailed explanations from advanced language models</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Secure Environment</h3>
+            <p>Your data stays on your machine with local processing for maximum privacy</p>
+        </div>
+    </div>
+</section>
+
+<section id="demo" class="cyber-section demo-section">
+    <h2>See <span class="highlight">CyberCrack</span> in Action</h2>
+    <div class="demo-container">
+        <div class="demo-screenshots">
+            <div class="slideshow-container">
+
+                <div class="screenshot-slide active">
+                    <img src="{{ url_for('static', filename='images/screenshot.png') }}" alt="Interview Session" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="screenshot-placeholder">
+                        <div class="placeholder-icon">🎙️</div>
+                        <span>Live Interview Session</span>
+                        <p>Real-time audio capture and transcription during practice</p>
+                    </div>
+                </div>
+                
+                <div class="screenshot-slide">
+                    <img src="{{ url_for('static', filename='images/screenshot.png') }}" alt="AI Feedback" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="screenshot-placeholder">
+                        <div class="placeholder-icon">🧠</div>
+                        <span>AI-Powered Feedback</span>
+                        <p>Detailed analysis and suggestions for improvement</p>
+                    </div>
+                </div>
+
+                <div class="screenshot-slide">
+                    <img src="{{ url_for('static', filename='images/screenshot1.png') }}" alt="Interview Session" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="screenshot-placeholder">
+                        <div class="placeholder-icon">🎙️</div>
+                        <span>Live Interview Session</span>
+                        <p>Real-time audio capture and transcription during practice</p>
+                    </div>
+                </div>
+                
+
+
+                <div class="screenshot-slide">
+                    <img src="{{ url_for('static', filename='images/screenshot2.png') }}" alt="AI Feedback" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="screenshot-placeholder">
+                        <div class="placeholder-icon">🧠</div>
+                        <span>AI-Powered Feedback</span>
+                        <p>Detailed analysis and suggestions for improvement</p>
+                    </div>
+                </div>
+                
+                <!-- Navigation arrows -->
+                <button class="slide-nav prev" onclick="changeSlide(-1)">‹</button>
+                <button class="slide-nav next" onclick="changeSlide(1)">›</button>
+                
+                <!-- Slide indicators -->
+                <div class="slide-indicators">
+                    <span class="indicator active" onclick="goToSlide(0)"></span>
+                    <span class="indicator" onclick="goToSlide(1)"></span>
+                    <span class="indicator" onclick="goToSlide(2)"></span>
+                    <span class="indicator" onclick="goToSlide(3)"></span>
+                    
+                </div>
+            </div>
+        </div>
+       <div class="demo-text">
+            <h3>Experience the future of interview preparation</h3>
+            <p>Watch how CyberCrack simulates real interview scenarios, provides instant feedback, and helps you improve your cybersecurity knowledge and communication skills.</p>
+            <ul class="demo-features">
+                <li>Realistic interview questions across all security domains</li>
+                <li>Detailed feedback on technical accuracy and presentation</li>
+                <li>Practice at your own pace with unlimited scenarios</li>
+            </ul>
+            <a href="#download" class="btn">Download Now! Get 5 mins of free trial</a>
+        </div>
+    </div>
+</section>
+
+<section id="download" class="cyber-section cta-section">
+    <div class="cta-content">
+        <h2>Ready to <span class="highlight">Crack</span> Your Next Interview?</h2>
+        <p>Get started with CyberCrack today and transform your interview performance</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('main.download_file') }}" class="btn btn-large">Download .exe File</a>
+            <a href="{{ url_for('main.purchase') }}" class="btn btn-outline btn-large">Purchase a License</a>
+        </div>
+    </div>
+</section>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.screenshot-slide');
+const indicators = document.querySelectorAll('.indicator');
+
+function showSlide(index) {
+    // Hide all slides
+    slides.forEach(slide => slide.classList.remove('active'));
+    indicators.forEach(indicator => indicator.classList.remove('active'));
+    
+    // Show current slide
+    slides[index].classList.add('active');
+    indicators[index].classList.add('active');
+}
+
+function changeSlide(direction) {
+    currentSlide += direction;
+    
+    if (currentSlide >= slides.length) {
+        currentSlide = 0;
+    } else if (currentSlide < 0) {
+        currentSlide = slides.length - 1;
+    }
+    
+    showSlide(currentSlide);
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    showSlide(currentSlide);
+}
+
+// Auto-advance slides every 5 seconds
+setInterval(() => {
+    changeSlide(1);
+}, 5000);
+
+// Pause auto-advance on hover
+const slideshowContainer = document.querySelector('.slideshow-container');
+let autoAdvance = true;
+
+slideshowContainer.addEventListener('mouseenter', () => {
+    autoAdvance = false;
+});
+
+slideshowContainer.addEventListener('mouseleave', () => {
+    autoAdvance = true;
+});
+</script>
+
+<style>
+    .hero-section {
+        position: relative;
+        height: 80vh;
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        overflow: hidden;
+        margin-bottom: 3rem;
+        padding: 2rem;
+    }
+    
+    .cyber-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(0,180,216,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,180,216,0.1) 1px, transparent 1px);
+        background-size: 30px 30px;
+        z-index: -1;
+    }
+    
+    .matrix-animation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent, var(--primary-bg)),
+                    linear-gradient(110deg, rgba(0,255,157,0.1), transparent),
+                    linear-gradient(-110deg, rgba(0,180,216,0.1), transparent);
+        z-index: -1;
+    }
+    
+    .hero-content {
+        max-width: 800px;
+        padding: 2rem;
+        z-index: 1;
+    }
+    
+    .hero-content h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        letter-spacing: 2px;
+        line-height: 1.1;
+        text-shadow: 0 0 10px rgba(0,180,216,0.5);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        color: var(--text-secondary);
+    }
+    
+    .highlight {
+        color: var(--neon-blue);
+        position: relative;
+    }
+    
+    .highlight::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -5px;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--neon-blue);
+        color: var(--neon-blue);
+    }
+    
+    .btn-outline:hover {
+        background: rgba(0,180,216,0.1);
+    }
+    
+    .btn-large {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+        background-color: rgba(13, 17, 23, 0.8);
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        border: 1px solid rgba(0,180,216,0.2);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 15px rgba(0,180,216,0.3);
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .demo-section {
+        margin-top: 5rem;
+    }
+    
+    .demo-container {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+    
+    .demo-screenshots {
+        flex: 1;
+    }
+    
+    .slideshow-container {
+        position: relative;
+        background: rgba(13, 17, 23, 0.9);
+        border: 1px solid rgba(0,180,216,0.3);
+        border-radius: 8px;
+        overflow: hidden;
+        height: 400px;
+    }
+    
+    .screenshot-slide {
+        display: none;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .screenshot-slide.active {
+        display: block;
+    }
+    
+    .screenshot-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .screenshot-placeholder {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(110deg, rgba(0,180,216,0.1) 0%, transparent 70%);
+    }
+    
+    .placeholder-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--neon-blue);
+    }
+    
+    .screenshot-placeholder span {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+    
+    .screenshot-placeholder p {
+        color: var(--text-secondary);
+        margin: 0;
+    }
+    
+    .slide-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,180,216,0.8);
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        z-index: 10;
+    }
+    
+    .slide-nav:hover {
+        background: var(--neon-blue);
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .slide-nav.prev {
+        left: 10px;
+    }
+    
+    .slide-nav.next {
+        right: 10px;
+    }
+    
+    .slide-indicators {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 10;
+    }
+    
+    .indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.5);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .indicator.active {
+        background: var(--neon-blue);
+        transform: scale(1.2);
+    }
+    
+    .indicator:hover {
+        background: rgba(0,180,216,0.8);
+    }
+    
+    .demo-features {
+        list-style: none;
+        padding: 0;
+        margin: 2rem 0;
+    }
+    
+    .demo-features li {
+        padding-left: 1.5rem;
+        position: relative;
+        margin-bottom: 0.8rem;
+    }
+    
+    .demo-features li::before {
+        content: '→';
+        color: var(--neon-blue);
+        position: absolute;
+        left: 0;
+    }
+    
+    .cta-section {
+        margin-top: 5rem;
+        text-align: center;
+        background: linear-gradient(rgba(13, 17, 23, 0.9), rgba(13, 17, 23, 0.9)),
+                    linear-gradient(45deg, rgba(0,180,216,0.1), transparent, rgba(0,255,157,0.1));
+        border-color: rgba(0,180,216,0.5);
+    }
+    
+    .cta-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    @media (min-width: 768px) {
+        .demo-container {
+            flex-direction: row;
+            align-items: center;
+        }
+        
+        .demo-screenshots, .demo-text {
+            flex: 1;
+        }
+        
+        .slideshow-container {
+            height: 350px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero-buttons, .cta-buttons {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .slideshow-container {
+            height: 300px;
+        }
+        
+        .slide-nav {
+            width: 35px;
+            height: 35px;
+            font-size: 1.2rem;
+        }
+    }
+</style>
+{% endblock %}

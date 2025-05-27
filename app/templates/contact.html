@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - CyberCrack{% endblock %}
+
+{% block content %}
+<div class="cyber-section contact-section">
+    <h1>Contact <span class="highlight">CyberCrack</span> Support</h1>
+    <p class="section-subtitle">Have questions or need assistance? We're here to help!</p>
+    
+    <div class="contact-container">
+        <div class="contact-info">
+            <h3>Get in Touch</h3>
+            <p>Our support team is available to assist you with any questions or issues you may have regarding CyberCrack.</p>
+            
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="contact-icon">✉️</div>
+                    <div class="contact-detail">
+                        <h4>Email</h4>
+                        <p>sbmtech@getcybercrack.com</p>
+                    </div>
+                </div>
+                
+                <div class="contact-method">
+                    <div class="contact-icon">⏱️</div>
+                    <div class="contact-detail">
+                        <h4>Response Time</h4>
+                        <p>Within 24 hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="contact-form-container">
+            <h3>Send Us a Message</h3>
+            <form method="POST" action="{{ url_for('main.contact') }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label for="{{ form.name.id }}">Name</label>
+                    {{ form.name(class="form-control", placeholder="Enter your name") }}
+                    {% if form.name.errors %}
+                        <div class="form-error">
+                            {% for error in form.name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.email.id }}">Email</label>
+                    {{ form.email(class="form-control", placeholder="Enter your email address") }}
+                    {% if form.email.errors %}
+                        <div class="form-error">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.message.id }}">Message</label>
+                    {{ form.message(class="form-control message-area", placeholder="Type your message here...", rows=5) }}
+                    {% if form.message.errors %}
+                        <div class="form-error">
+                            {% for error in form.message.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-submit">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .contact-section {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+    
+    .highlight {
+        color: var(--neon-blue);
+    }
+    
+    .section-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .contact-container {
+        display: flex;
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .contact-info, .contact-form-container {
+        flex: 1;
+    }
+    
+    .contact-info {
+        background-color: rgba(13, 17, 23, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 8px;
+        padding: 2rem;
+    }
+    
+    .contact-methods {
+        margin-top: 2rem;
+    }
+    
+    .contact-method {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        color: var(--neon-blue);
+    }
+    
+    .contact-detail h4 {
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .contact-detail p {
+        margin: 0;
+        color: var(--text-secondary);
+    }
+    
+    .contact-form-container {
+        background-color: rgba(22, 27, 34, 0.8);
+        border-radius: 8px;
+        padding: 2rem;
+        border: 1px solid rgba(0, 180, 216, 0.3);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        background-color: rgba(13, 17, 23, 0.8);
+        border: 1px solid rgba(139, 148, 158, 0.3);
+        border-radius: 4px;
+        color: var(--text-primary);
+        font-family: 'Rajdhani', sans-serif;
+        transition: all 0.3s;
+    }
+    
+    .message-area {
+        resize: vertical;
+        min-height: 120px;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 0 2px rgba(0, 180, 216, 0.2);
+    }
+    
+    .form-error {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+    }
+    
+    .form-submit {
+        margin-top: 2rem;
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .contact-container {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

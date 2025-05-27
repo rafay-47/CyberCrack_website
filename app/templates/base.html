@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CyberCrack - AI Security Interview Prep{% endblock %}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7x2e5z5l5e5f5e5f5e5f5e5f5e5f5e5f" crossorigin="anonymous">
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/payment.js') }}" defer></script>
+    <style>
+        :root {
+            --primary-bg: #0d1117;
+            --secondary-bg: #161b22;
+            --neon-blue: #00b4d8;
+            --neon-green: #00ff9d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #5900ff;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 25px 25px, rgba(0, 180, 216, 0.15) 2px, transparent 0),
+                linear-gradient(to right, rgba(0, 180, 216, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 180, 216, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        header {
+            background-color: var(--secondary-bg);
+            border-bottom: 1px solid rgba(0, 180, 216, 0.3);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(0, 180, 216, 0.5);
+        }
+        
+        .logo-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--neon-blue);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, var(--neon-blue), transparent);
+            transition: width 0.3s;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        main {
+            min-height: calc(100vh - 150px);
+            padding: 2rem 5%;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 180, 216, 0.5);
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.8);
+        }
+        
+        footer {
+            background-color: var(--secondary-bg);
+            padding: 1.5rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(0, 180, 216, 0.3);
+        }
+        
+        .cyber-section {
+            position: relative;
+            border: 1px solid rgba(0, 180, 216, 0.3);
+            background-color: rgba(22, 27, 34, 0.7);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cyber-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, var(--neon-blue), transparent);
+            z-index: -1;
+            border-radius: 10px;
+            opacity: 0.5;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                gap: 1rem;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--secondary-bg);
+                padding: 1rem 0;
+                transform: translateY(-150%);
+                transition: transform 0.3s;
+                opacity: 0;
+            }
+            
+            nav.open ul {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <h1 ><a class="logo" href="{{ url_for('main.index') }}">CyberCrack</a></h1>
+                <span class="logo-subtitle">AI Security Interview Prep</span>
+            </div>
+            <ul>
+                <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+                <li><a href="{{ url_for('main.download_file') }}">Download</a></li>
+                <li><a href="{{ url_for('main.purchase') }}">Purchase</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 CyberCrack. All rights reserved.</p>
+    </footer>
+</body>
+</html>

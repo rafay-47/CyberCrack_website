@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful - CyberCrack{% endblock %}
+
+{% block content %}
+<div class="cyber-section success-section">
+    <div class="success-icon">✓</div>
+    <h1>Payment Successful!</h1>
+    <p class="success-message">Thank you for purchasing CyberCrack. Your license has been created successfully.</p>
+    
+    <div class="license-info">
+        <h3>Your License Information</h3>
+        <p>We've sent your license key and download instructions to your email address.</p>
+        <p>Order ID: <span class="highlight">{{ session_id }}</span></p>
+    </div>
+    
+    <div class="next-steps">
+        <h3>Next Steps</h3>
+        <ol>
+            <li>Check your email for license details</li>
+            <li>Download the CyberCrack software</li>
+            <li>Install using the instructions provided</li>
+            <li>Enter your license key when prompted during setup</li>
+        </ol>
+        <div class="action-buttons">
+            <a href="{{ url_for('main.download_file') }}" class="btn">Download Software</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-section {
+        max-width: 700px;
+        margin: 3rem auto;
+        text-align: center;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background-color: rgba(0, 255, 157, 0.2);
+        border-radius: 50%;
+        margin: 0 auto 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--neon-green);
+        border: 2px solid var(--neon-green);
+    }
+    
+    .success-message {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .license-info {
+        background-color: rgba(13, 17, 23, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        text-align: left;
+    }
+    
+    .highlight {
+        color: var(--neon-blue);
+        font-weight: 600;
+        background-color: rgba(0, 180, 216, 0.1);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 180, 216, 0.2);
+    }
+    
+    .next-steps {
+        text-align: left;
+        margin-top: 2rem;
+    }
+    
+    .next-steps ol {
+        padding-left: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .next-steps li {
+        margin-bottom: 0.8rem;
+    }
+    
+    .action-buttons {
+        margin-top: 2rem;
+        text-align: center;
+    }
+</style>
+{% endblock %}

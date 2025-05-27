@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase CyberCrack License{% endblock %}
+
+{% block content %}
+<div class="cyber-section purchase-section">
+    <h1>Purchase <span class="highlight">CyberCrack</span> License</h1>
+    <p class="section-subtitle">Get full access to our AI-powered interview preparation software</p>
+    
+    <div class="pricing-container">
+        <div class="pricing-card">
+            <h2>Standard License</h2>
+            <div class="price">$9.99</div>
+            <ul class="pricing-features">
+                <li>Full access to CyberCrack software</li>
+                <li>1 hour of usage</li>
+                <li>Access to all security domains</li>
+                <li>Export interview transcripts</li>
+            </ul>
+            <p class="pricing-note">Hourly usage subscription plan</p>
+        </div>
+    </div>
+    
+    <div class="purchase-form-container">
+        <h3>Complete Your Purchase</h3>
+        <form method="POST" action="{{ url_for('main.purchase') }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="{{ form.name.id }}">Name</label>
+                {{ form.name(class="form-control", placeholder="Enter your full name") }}
+                {% if form.name.errors %}
+                    <div class="form-error">
+                        {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.email.id }}">Email</label>
+                {{ form.email(class="form-control", placeholder="Enter your email address") }}
+                {% if form.email.errors %}
+                    <div class="form-error">
+                        {% for error in form.email.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.amount.id }}">Amount</label>
+                {{ form.amount(class="form-control", value="9.99", readonly=true) }}
+            </div>
+            
+            <div class="form-submit">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+    
+    <div class="secure-payment">
+        <div class="secure-icon">🔒</div>
+        <p>Secure payment processing by Stripe</p>
+    </div>
+</div>
+
+<style>
+    .purchase-section {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+    
+    .highlight {
+        color: var(--neon-blue);
+    }
+    
+    .section-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .pricing-container {
+        margin: 3rem 0;
+    }
+    
+    .pricing-card {
+        background-color: rgba(13, 17, 23, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 8px;
+        padding: 2rem;
+        max-width: 400px;
+        margin: 0 auto;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .price {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--neon-blue);
+        margin: 1rem 0;
+    }
+    
+    .pricing-features {
+        list-style: none;
+        padding: 0;
+        margin: 1.5rem 0;
+    }
+    
+    .pricing-features li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(139, 148, 158, 0.2);
+        position: relative;
+        padding-left: 1.8rem;
+    }
+    
+    .pricing-features li::before {
+        content: '✓';
+        color: var(--neon-green);
+        position: absolute;
+        left: 0;
+    }
+    
+    .pricing-note {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+    
+    .purchase-form-container {
+        max-width: 500px;
+        margin: 3rem auto;
+        background-color: rgba(22, 27, 34, 0.8);
+        border-radius: 8px;
+        padding: 2rem;
+        border: 1px solid rgba(0, 180, 216, 0.3);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        background-color: rgba(13, 17, 23, 0.8);
+        border: 1px solid rgba(139, 148, 158, 0.3);
+        border-radius: 4px;
+        color: var(--text-primary);
+        font-family: 'Rajdhani', sans-serif;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 0 2px rgba(0, 180, 216, 0.2);
+    }
+    
+    .form-error {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+    }
+    
+    .form-submit {
+        margin-top: 2rem;
+        text-align: center;
+    }
+    
+    .secure-payment {
+        text-align: center;
+        margin: 2rem 0;
+    }
+    
+    .secure-icon {
+        font-size: 2rem;
+        color: var(--neon-green);
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-logos {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .payment-logo {
+        height: 30px;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
