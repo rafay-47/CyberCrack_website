@@ -7,6 +7,23 @@
     <h1>Contact <span class="highlight">CyberCrack</span> Support</h1>
     <p class="section-subtitle">Have questions or need assistance? We're here to help!</p>
     
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}" id="flash-message">
+                    <div class="flash-content">
+                        <span class="flash-icon">
+                            {% if category == 'success' %}✅{% elif category == 'error' %}❌{% else %}ℹ️{% endif %}
+                        </span>
+                        <span class="flash-text">{{ message }}</span>
+                        <button class="flash-close" onclick="closeFlashMessage()">&times;</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
     <div class="contact-container">
         <div class="contact-info">
             <h3>Get in Touch</h3>
@@ -17,7 +34,7 @@
                     <div class="contact-icon">✉️</div>
                     <div class="contact-detail">
                         <h4>Email</h4>
-                        <p>sbmtech@getcybercrack.com</p>
+                        <p>cybercrack@sbmtechpro.com</p>
                     </div>
                 </div>
                 
@@ -33,7 +50,7 @@
         
         <div class="contact-form-container">
             <h3>Send Us a Message</h3>
-            <form method="POST" action="{{ url_for('main.contact') }}">
+            <form method="POST" action="{{ url_for('main.contact') }}" id="contact-form">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     <label for="{{ form.name.id }}">Name</label>
@@ -72,12 +89,13 @@
                 </div>
                 
                 <div class="form-submit">
-                    {{ form.submit(class="btn btn-primary") }}
+                    {{ form.submit(class="btn btn-primary", id="submit-btn") }}
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 
 <style>
     .contact-section {
@@ -95,6 +113,158 @@
         font-size: 1.2rem;
         margin-bottom: 2rem;
         text-align: center;
+    }
+
+    /* Flash Messages */
+    .flash-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .flash-success {
+        background: linear-gradient(135deg, #00ff9d, #00b4d8);
+        border: 1px solid #00ff9d;
+    }
+
+    .flash-error {
+        background: linear-gradient(135deg, #ff6b6b, #ff4757);
+        border: 1px solid #ff6b6b;
+    }
+
+    .flash-content {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        color: white;
+        font-weight: 500;
+    }
+
+    .flash-icon {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+
+    .flash-text {
+        flex: 1;
+        margin-right: 0.5rem;
+    }
+
+    .flash-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.3s;
+    }
+
+    .flash-close:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, var(--secondary-bg), var(--primary-bg));
+        margin: 10% auto;
+        border: 2px solid var(--neon-blue);
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 0 30px rgba(0, 180, 216, 0.5);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(0, 180, 216, 0.3);
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: var(--neon-green);
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    .modal-close {
+        color: var(--text-secondary);
+        font-size: 2rem;
+        font-weight: bold;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+
+    .modal-close:hover {
+        color: var(--neon-blue);
+        background-color: rgba(0, 180, 216, 0.1);
+    }
+
+    .modal-body {
+        padding: 2rem;
+        text-align: center;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .modal-footer {
+        padding: 1rem 2rem;
+        text-align: center;
+        border-top: 1px solid rgba(0, 180, 216, 0.3);
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
     
     .contact-container {
@@ -187,6 +357,64 @@
         .contact-container {
             flex-direction: column;
         }
+
+        .flash-message {
+            left: 20px;
+            right: 20px;
+            max-width: none;
+        }
+
+        .modal-content {
+            margin: 5% auto;
+            width: 95%;
+        }
     }
 </style>
+
+<script>
+// Auto-close flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const flashMessage = document.getElementById('flash-message');
+    if (flashMessage) {
+        setTimeout(function() {
+            closeFlashMessage();
+        }, 5000);
+
+        // Show modal for success messages
+        if (flashMessage.classList.contains('flash-success')) {
+            setTimeout(function() {
+                showModal();
+            }, 500);
+        }
+    }
+});
+
+function closeFlashMessage() {
+    const flashMessage = document.getElementById('flash-message');
+    if (flashMessage) {
+        flashMessage.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(function() {
+            flashMessage.remove();
+        }, 300);
+    }
+}
+
+
+
+// Add slide out animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}

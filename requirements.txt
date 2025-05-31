@@ -8,3 +8,4 @@ email-validator
 mailersend
 Pyjwt
 python-dotenv
+email-validator

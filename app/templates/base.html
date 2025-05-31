@@ -175,6 +175,57 @@
             font-family: 'Orbitron', sans-serif;
         }
         
+        /* Base Flash Messages (for pages that don't have custom styles) */
+        .base-flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .base-flash-message {
+            margin-bottom: 10px;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: baseSlideIn 0.3s ease-out;
+        }
+
+        .base-flash-success {
+            background: linear-gradient(135deg, #00ff9d, #00b4d8);
+            border-color: #00ff9d;
+        }
+
+        .base-flash-error {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            border-color: #ff6b6b;
+        }
+
+        .base-flash-warning {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+            border-color: #ffa726;
+        }
+
+        .base-flash-info {
+            background: linear-gradient(135deg, #42a5f5, #2196f3);
+            border-color: #42a5f5;
+        }
+
+        @keyframes baseSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
         /* Responsive styles */
         @media (max-width: 768px) {
             nav ul {
@@ -199,6 +250,12 @@
             .mobile-toggle {
                 display: block;
             }
+
+            .base-flash-messages {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
         }
     </style>
 </head>
@@ -218,6 +275,21 @@
         </nav>
     </header>
 
+    <!-- Base Flash Messages (for pages without custom flash handling) -->
+    {% if request.endpoint != 'main.contact' %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="base-flash-messages">
+                    {% for category, message in messages %}
+                        <div class="base-flash-message base-flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+
     <main>
         {% block content %}
         {% endblock %}
@@ -226,5 +298,36 @@
     <footer>
         <p>&copy; 2025 CyberCrack. All rights reserved.</p>
     </footer>
+
+    <script>
+        // Auto-close base flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const baseFlashMessages = document.querySelectorAll('.base-flash-message');
+            baseFlashMessages.forEach(function(message, index) {
+                setTimeout(function() {
+                    message.style.animation = 'baseSlideOut 0.3s ease-out';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 300);
+                }, 5000 + (index * 500)); // Stagger removal if multiple messages
+            });
+        });
+
+        // Add slide out animation for base flash messages
+        const baseStyle = document.createElement('style');
+        baseStyle.textContent = `
+            @keyframes baseSlideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(baseStyle);
+    </script>
 </body>
 </html>

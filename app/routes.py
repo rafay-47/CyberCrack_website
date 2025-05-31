@@ -101,7 +101,7 @@ def success():
             # Generate license key
             license_key = generate_license(customer_email)
             
-            # Send license key via email
+            # Send license key via email with validation
             email_service = EmailService()
             email_result = email_service.send_license_email(
                 to_email=customer_email,
@@ -113,10 +113,18 @@ def success():
             if email_result['success']:
                 flash('Payment successful! Your license key has been sent to your email.', 'success')
             else:
-                flash('Payment successful! There was an issue sending your license key. Please contact support.', 'warning')
+                # Handle email validation or sending errors
+                error_message = email_result.get('error', 'Unknown error')
+                if 'validation failed' in error_message.lower():
+                    flash(f'Payment successful! However, there was an issue with your email address: {error_message}. Please contact support with your order ID: {session_id}', 'warning')
+                else:
+                    flash('Payment successful! There was an issue sending your license key. Please contact support.', 'warning')
+                
+                # Log the error for manual follow-up
+                #print(f"Email error for order {session_id}: {error_message}")
                 
             # Log the license key (for debugging)
-            print(f"Generated license key for {customer_email}: {license_key}")
+            #print(f"Generated license key for {customer_email}: {license_key}")
             
         else:
             flash('Payment not completed. Please try again.', 'error')
