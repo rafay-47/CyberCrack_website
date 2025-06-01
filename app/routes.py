@@ -7,9 +7,27 @@ from app.forms import PurchaseForm, ContactForm
 import jwt
 from datetime import datetime, timedelta
 from pathlib import Path
-
+import secrets
 
 main_blueprint = Blueprint('main', __name__)
+
+def is_admin_email(email):
+    """
+    Check if an email is an admin email using environment variables
+    Supports multiple admin emails separated by commas
+    """
+    admin_emails_str = os.environ.get('ADMIN_EMAILS', '')
+    if not admin_emails_str:
+        return False
+    
+    admin_emails = [email.strip().lower() for email in admin_emails_str.split(',')]
+    return email.lower().strip() in admin_emails
+
+def generate_admin_order_id():
+    """Generate a unique order ID for admin-generated licenses"""
+    timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    random_suffix = secrets.token_hex(4).upper()
+    return f"ADMIN_{timestamp}_{random_suffix}"
 
 @main_blueprint.route('/')
 def index():
@@ -24,12 +42,70 @@ def download():
 def purchase():
     form = PurchaseForm()
     if form.validate_on_submit():
+        email = form.email.data.strip()
+        name = form.name.data.strip()
+        
+        # Check if this is an admin email
+        if is_admin_email(email):
+            # Admin email detected - generate license directly without payment
+            return redirect(url_for('main.admin_license_success', 
+                                   name=name, 
+                                   email=email,
+                                   days=30))  # Default 30 days for admin
+        
+        # Normal purchase flow for non-admin emails
         return redirect(url_for('main.create_checkout_session', 
-                               name=form.name.data, 
-                               email=form.email.data, 
+                               name=name, 
+                               email=email, 
                                amount=int(form.amount.data*100)))
     return render_template('purchase.html', form=form)
 
+@main_blueprint.route('/admin-license-success')
+def admin_license_success():
+    """Handle admin license generation without payment"""
+    name = request.args.get('name')
+    email = request.args.get('email')
+    days = int(request.args.get('days', 30))
+    
+    # Double-check admin email for security
+    if not is_admin_email(email):
+        flash('Access denied. Invalid admin email.', 'error')
+        return redirect(url_for('main.purchase'))
+    
+    try:
+        # Generate license key
+        license_key = generate_license(email, days)
+        
+        # Generate admin order ID
+        order_id = generate_admin_order_id()
+        
+        # Send license key via email
+        email_service = EmailService()
+        email_result = email_service.send_admin_license_email(
+            to_email=email,
+            to_name=name,
+            license_key=license_key,
+            order_id=order_id,
+            valid_days=days
+        )
+        
+        if email_result['success']:
+            flash(f'Admin license generated successfully! License sent to {email}', 'success')
+        else:
+            flash(f'License generated (Order: {order_id}) but email failed: {email_result.get("error", "Unknown error")}', 'warning')
+        
+        # Log for admin reference (remove in production or use proper logging)
+        print(f"Admin license generated - Email: {email}, Order: {order_id}, Key: {license_key}")
+        
+    except Exception as e:
+        flash(f'Error generating admin license: {str(e)}', 'error')
+        return redirect(url_for('main.purchase'))
+    
+    return render_template('admin_success.html', 
+                          order_id=order_id, 
+                          email=email, 
+                          license_key=license_key,
+                          valid_days=days)
 
 @main_blueprint.route('/create-checkout-session')
 def create_checkout_session():
@@ -58,8 +134,6 @@ def create_checkout_session():
     except Exception as e:
         return jsonify(error=str(e)), 403
 
-
-
 def generate_license(user_id, valid_days=30):
     """Generate a license key valid for the specified number of days"""
     # Load the private key (this should be kept secure)
@@ -83,7 +157,6 @@ def generate_license(user_id, valid_days=30):
     )
     
     return token
-
 
 @main_blueprint.route('/success')
 def success():
@@ -138,7 +211,6 @@ def success():
 def cancel():
     return render_template('cancel.html')
 
-
 @main_blueprint.route('/download_file')
 def download_file():
     try:
@@ -150,7 +222,6 @@ def download_file():
     except FileNotFoundError:
         flash('The requested file is not available for download at this time.', 'error')
         return redirect(url_for('main.download'))
-
 
 @main_blueprint.route('/contact', methods=['GET', 'POST'])
 def contact():
