@@ -13,9 +13,16 @@ class StripeCheckout:
         )
         stripe.api_key = self.api_key
     
-    def create_session(self, name, email, amount=999, success_url=None, cancel_url=None):
+    def create_session(self, name, email, amount=999, success_url=None, cancel_url=None, hours=1):
         """Create a Stripe checkout session"""
         try:
+            # Ensure hours is an integer
+            hours = int(hours) if hours else 1
+            
+            # Format product description based on hours
+            hours_text = f"{hours} hour{'s' if hours > 1 else ''}"
+            product_description = f'AI Security Interview Preparation Software - {hours_text} license'
+            
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
                 line_items=[
@@ -23,8 +30,8 @@ class StripeCheckout:
                         'price_data': {
                             'currency': 'usd',
                             'product_data': {
-                                'name': 'CyberCrack License',
-                                'description': 'AI Security Interview Preparation Software',
+                                'name': f'CyberCrack License ({hours_text})',
+                                'description': product_description,
                             },
                             'unit_amount': int(amount),
                         },
@@ -34,6 +41,7 @@ class StripeCheckout:
                 metadata={
                     'name': name,
                     'email': email,
+                    'hours': str(hours),
                 },
                 mode='payment',
                 success_url=success_url,

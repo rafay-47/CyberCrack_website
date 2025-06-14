@@ -5,25 +5,85 @@
 {% block content %}
 <div class="cyber-section purchase-section">
     <h1>Purchase <span class="highlight">CyberCrack</span> License</h1>
-    <p class="section-subtitle">Get full access to our AI-powered interview preparation software</p>
+    <p class="section-subtitle">Get full access to our AI-powered interview preparation software with usage-based licensing</p>
     
     <div class="pricing-container">
-        <div class="pricing-card">
-            <h2>Standard License</h2>
-            <div class="price">$9.99</div>
-            <ul class="pricing-features">
-                <li>Full access to CyberCrack software</li>
-                <li>1 hour of usage</li>
-                <li>Access to all security domains</li>
-                <li>Export interview transcripts</li>
+        <div class="pricing-grid">
+            <div class="pricing-card" data-duration="1" data-price="9.99">
+                <h3>1 Hour Usage</h3>
+                <div class="price">$9.99</div>
+                <ul class="pricing-features">
+                    <li>Full access to CyberCrack software</li>
+                    <li>1 hour of active usage time</li>
+                    <li>Access to all security domains</li>
+                    <li>Usage timer tracks actual usage</li>
+                </ul>
+            </div>
+            
+            <div class="pricing-card" data-duration="2" data-price="19.99">
+                <h3>2 Hours Usage</h3>
+                <div class="price">$19.99</div>
+                <ul class="pricing-features">
+                    <li>Full access to CyberCrack software</li>
+                    <li>2 hours of active usage time</li>
+                    <li>Access to all security domains</li>
+                    <li>Usage timer tracks actual usage</li>
+                </ul>
+                <div class="value-badge">Popular</div>
+            </div>
+            
+            <div class="pricing-card" data-duration="3" data-price="29.99">
+                <h3>3 Hours Usage</h3>
+                <div class="price">$29.99</div>
+                <ul class="pricing-features">
+                    <li>Full access to CyberCrack software</li>
+                    <li>3 hours of active usage time</li>
+                    <li>Access to all security domains</li>
+                    <li>Usage timer tracks actual usage</li>
+                </ul>
+            </div>
+            
+            <div class="pricing-card" data-duration="4" data-price="37.00">
+                <h3>4 Hours Usage</h3>
+                <div class="price">$37.00</div>
+                <ul class="pricing-features">
+                    <li>Full access to CyberCrack software</li>
+                    <li>4 hours of active usage time</li>
+                    <li>Access to all security domains</li>
+                    <li>Usage timer tracks actual usage</li>
+                </ul>
+                <div class="value-badge">Best Value</div>
+            </div>
+            
+            <div class="pricing-card" data-duration="5" data-price="45.00">
+                <h3>5 Hours Usage</h3>
+                <div class="price">$45.00</div>
+                <ul class="pricing-features">
+                    <li>Full access to CyberCrack software</li>
+                    <li>5 hours of active usage time</li>
+                    <li>Access to all security domains</li>
+                    <li>Usage timer tracks actual usage</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="usage-explanation">
+        <div class="usage-info">
+            <h3>🕒 How Usage-Based Licensing Works</h3>
+            <p>Your license provides actual usage time, not calendar time. The timer only runs when you're actively using the software:</p>
+            <ul>
+                <li>✅ Timer starts when you begin using CyberCrack</li>
+                <li>✅ Timer pauses when close the software</li>
+                <li>✅ Only active usage time is counted</li>
+                <li>✅ Use your hours whenever convenient</li>
             </ul>
-            <p class="pricing-note">Hourly usage subscription plan</p>
         </div>
     </div>
     
     <div class="purchase-form-container">
         <h3>Complete Your Purchase</h3>
-        <form method="POST" action="{{ url_for('main.purchase') }}">
+        <form method="POST" action="{{ url_for('main.purchase') }}" id="purchaseForm">
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="{{ form.name.id }}">Name</label>
@@ -50,8 +110,24 @@
             </div>
             
             <div class="form-group">
-                <label for="{{ form.amount.id }}">Amount</label>
-                {{ form.amount(class="form-control", value="9.99", readonly=true) }}
+                <label for="{{ form.license_duration.id }}">Usage Hours</label>
+                {{ form.license_duration(class="form-control") }}
+                {% if form.license_duration.errors %}
+                    <div class="form-error">
+                        {% for error in form.license_duration.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            {{ form.amount() }}
+            
+            <div class="selected-plan">
+                <h4>Selected Plan:</h4>
+                <div class="plan-summary">
+                    <span id="selectedDuration">1 Hour</span> of usage time - <span id="selectedPrice">$9.99</span>
+                </div>
             </div>
             
             <div class="form-submit">
@@ -67,9 +143,64 @@
 
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const licenseSelect = document.getElementById('license_duration');
+    const amountField = document.getElementById('amount');
+    const selectedDuration = document.getElementById('selectedDuration');
+    const selectedPrice = document.getElementById('selectedPrice');
+    const pricingCards = document.querySelectorAll('.pricing-card');
+    
+    // Pricing mapping
+    const pricing = {
+        '1': 9.99,
+        '2': 19.99,
+        '3': 29.99,
+        '4': 37.00,
+        '5': 45.00
+    };
+    
+    function updateSelection() {
+        const duration = licenseSelect.value;
+        const price = pricing[duration];
+        
+        // Update hidden amount field
+        amountField.value = price;
+        
+        // Update display
+        selectedDuration.textContent = duration + ' Hour' + (parseInt(duration) > 1 ? 's' : '');
+        selectedPrice.textContent = '$' + price.toFixed(2);
+        
+        // Update card highlighting
+        pricingCards.forEach(card => {
+            card.classList.remove('selected');
+            if (card.dataset.duration === duration) {
+                card.classList.add('selected');
+            }
+        });
+    }
+    
+    // Handle select change
+    licenseSelect.addEventListener('change', updateSelection);
+    
+    // Handle card clicks - use event delegation to avoid conflicts
+    document.querySelector('.pricing-grid').addEventListener('click', function(e) {
+        const card = e.target.closest('.pricing-card');
+        if (card) {
+            const duration = card.dataset.duration;
+            licenseSelect.value = duration;
+            updateSelection();
+        }
+    });
+    
+    // Initialize
+    updateSelection();
+});
+</script>
+
 <style>
     .purchase-section {
-        max-width: 900px;
+        max-width: 1200px;
         margin: 2rem auto;
         padding: 2rem;
     }
@@ -82,33 +213,65 @@
         color: var(--text-secondary);
         font-size: 1.2rem;
         margin-bottom: 2rem;
+        text-align: center;
     }
     
     .pricing-container {
         margin: 3rem 0;
     }
     
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
     .pricing-card {
         background-color: rgba(13, 17, 23, 0.8);
-        border: 1px solid rgba(0, 180, 216, 0.3);
+        border: 2px solid rgba(0, 180, 216, 0.3);
         border-radius: 8px;
-        padding: 2rem;
-        max-width: 400px;
-        margin: 0 auto;
+        padding: 1.5rem;
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .pricing-card:hover {
+        border-color: var(--neon-blue);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
+    }
+    
+    .pricing-card.selected {
+        border-color: var(--neon-green);
+        background-color: rgba(0, 180, 216, 0.1);
+    }
+    
+    .pricing-card h3 {
+        margin: 0 0 1rem 0;
+        color: var(--text-primary);
+        text-align: center;
+        pointer-events: none;
     }
     
     .price {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: bold;
         color: var(--neon-blue);
         margin: 1rem 0;
+        text-align: center;
+        pointer-events: none;
     }
     
     .pricing-features {
         list-style: none;
         padding: 0;
         margin: 1.5rem 0;
+        pointer-events: none;
     }
     
     .pricing-features li {
@@ -116,6 +279,7 @@
         border-bottom: 1px solid rgba(139, 148, 158, 0.2);
         position: relative;
         padding-left: 1.8rem;
+        font-size: 0.9rem;
     }
     
     .pricing-features li::before {
@@ -125,10 +289,55 @@
         left: 0;
     }
     
-    .pricing-note {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-        font-style: italic;
+    .value-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
+        pointer-events: none;
+        z-index: 2;
+    }
+    
+    .usage-explanation {
+        max-width: 800px;
+        margin: 3rem auto;
+    }
+    
+    .usage-info {
+        background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(0, 180, 216, 0.1));
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .usage-info h3 {
+        color: var(--neon-green);
+        margin-bottom: 1rem;
+    }
+    
+    .usage-info p {
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+    }
+    
+    .usage-info ul {
+        list-style: none;
+        padding: 0;
+        text-align: left;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .usage-info li {
+        padding: 0.5rem 0;
+        color: var(--text-primary);
     }
     
     .purchase-form-container {
@@ -138,10 +347,19 @@
         border-radius: 8px;
         padding: 2rem;
         border: 1px solid rgba(0, 180, 216, 0.3);
+        position: relative;
+        z-index: 10;
     }
     
     .form-group {
         margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        font-weight: bold;
     }
     
     .form-control {
@@ -153,6 +371,9 @@
         color: var(--text-primary);
         font-family: 'Rajdhani', sans-serif;
         transition: all 0.3s;
+        box-sizing: border-box;
+        position: relative;
+        z-index: 11;
     }
     
     .form-control:focus {
@@ -167,9 +388,53 @@
         margin-top: 0.3rem;
     }
     
+    .selected-plan {
+        background-color: rgba(0, 180, 216, 0.1);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 6px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    .selected-plan h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--neon-blue);
+    }
+    
+    .plan-summary {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--text-primary);
+    }
+    
     .form-submit {
         margin-top: 2rem;
         text-align: center;
+    }
+    
+    .btn {
+        background: linear-gradient(135deg, var(--neon-blue), #0099b8);
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        position: relative;
+        z-index: 12;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 180, 216, 0.4);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--neon-blue), #0099b8);
     }
     
     .secure-payment {
@@ -183,17 +448,23 @@
         margin-bottom: 0.5rem;
     }
     
-    .payment-logos {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 1rem;
+    @media (max-width: 768px) {
+        .pricing-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .pricing-card {
+            margin-bottom: 1rem;
+        }
+        
+        .purchase-form-container {
+            margin: 2rem 1rem;
+            padding: 1.5rem;
+        }
+        
+        .usage-info ul {
+            max-width: 100%;
+        }
     }
-    
-    .payment-logo {
-        height: 30px;
-        opacity: 0.7;
-    }
-    
 </style>
 {% endblock %}
