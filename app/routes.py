@@ -35,8 +35,20 @@ def index():
 
 @main_blueprint.route('/download')
 def download():
-    # This will be implemented later
     return render_template('download.html')
+
+@main_blueprint.route('/download_manual')
+def download_manual():
+    try:
+        return send_from_directory(
+            current_app.static_folder,
+            'user-manual/CyberCrack_User_Manual.txt',
+            as_attachment=True,
+            download_name='CyberCrack_User_Manual.txt'
+        )
+    except FileNotFoundError:
+        flash('The user manual is not available for download at this time.', 'error')
+        return redirect(url_for('main.download'))
 
 @main_blueprint.route('/purchase', methods=['GET', 'POST'])
 def purchase():

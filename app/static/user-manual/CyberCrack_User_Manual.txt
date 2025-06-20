@@ -1,0 +1,353 @@
+ ═══════════════════════════════════════════════════════════════════
+                    CYBERCRACK INTERVIEW TRAINER
+                           USER MANUAL v1.0
+═══════════════════════════════════════════════════════════════════
+
+TABLE OF CONTENTS
+═════════════════
+1. Overview
+2. System Requirements
+3. Installation
+4. Getting Started
+5. Features and Functions
+6. Button Reference
+7. Audio and Transcription
+8. AI Analysis Features
+9. License Management
+10. Troubleshooting
+11. Tips for Best Results
+
+═══════════════════════════════════════════════════════════════════
+1. OVERVIEW
+═══════════════════════════════════════════════════════════════════
+
+CyberCrack Interview Trainer is an advanced AI-powered application designed 
+to help cybersecurity professionals and students practice for technical 
+interviews. The application specializes in:
+
+✅ Cybersecurity and Application Security
+✅ Penetration Testing
+✅ DevSecOps and DevOps
+✅ Cloud Security & Infrastructure
+✅ Software Development Security
+✅ Governance, Risk & Compliance (GRC)
+✅ IT Audit and OWASP Top 10
+
+KEY CAPABILITIES:
+• Real-time audio recording and transcription
+• AI-powered interview responses and feedback
+• Screenshot analysis with code review
+• Multiple domain-specific training modes
+• Freeze/unfreeze functionality for focused practice
+• Always-on-top mode for seamless workflow
+
+═══════════════════════════════════════════════════════════════════
+2. SYSTEM REQUIREMENTS
+═══════════════════════════════════════════════════════════════════
+
+OPERATING SYSTEM:
+• Windows 10/11 (Primary support)
+• macOS 10.14+ (Limited support)
+• Linux Ubuntu 18.04+ (Limited support)
+
+HARDWARE:
+• Minimum 8GB RAM (16GB recommended)
+• 1GB available disk space
+• Microphone (built-in or external)
+• Speakers or headphones
+• Internet connection for AI features
+
+SOFTWARE DEPENDENCIES:
+• CUDA-compatible GPU (optional, for faster processing)
+
+═══════════════════════════════════════════════════════════════════
+3. INSTALLATION
+═══════════════════════════════════════════════════════════════════
+
+EXECUTABLE INSTALLATION 
+1. Download "CyberCrack.exe" from the website (www.getcybercrack.com)
+2. Run the installer as Administrator
+3. Follow the installation wizard
+4. Launch "CyberCrack" from the Start Menu
+
+
+═══════════════════════════════════════════════════════════════════
+4. GETTING STARTED
+═══════════════════════════════════════════════════════════════════
+
+FIRST LAUNCH:
+1. Start the application
+2. The app will initialize audio systems automatically
+3. Choose your preferred domain from the dropdown (optional)
+
+BASIC WORKFLOW:
+1. Select your interview domain (Application Security, Pentesting, etc.)
+2. Application will begin audio recording
+3. Speak your questions or responses
+4. Watch real-time transcription in the "Your Responses" area
+5. View AI feedback in the "AI Feedback" area
+6. Use screenshot analysis for code review questions
+
+
+═══════════════════════════════════════════════════════════════════
+6. FEATURES AND FUNCTIONS
+═══════════════════════════════════════════════════════════════════
+
+🎤 AUDIO RECORDING SYSTEM:
+• Real-time microphone capture
+• Speaker audio recording (for interview calls)
+• Automatic noise reduction
+• Multiple audio device support
+
+📝 TRANSCRIPTION ENGINE:
+• Powered by OpenAI Whisper
+• Real-time speech-to-text conversion
+• High accuracy for technical terminology
+
+🤖 AI ANALYSIS:
+• Expert-level cybersecurity responses
+• Domain-specific knowledge base
+• OWASP Top 10 vulnerability coverage
+• Real-world scenario examples
+• Step-by-step explanations
+
+📷 SCREENSHOT ANALYSIS:
+• Capture and analyze code screenshots
+• Security vulnerability detection
+• Code quality assessment
+• Best practice recommendations
+• Language and framework identification
+
+
+═══════════════════════════════════════════════════════════════════
+7. BUTTON REFERENCE
+═══════════════════════════════════════════════════════════════════
+
+🗑️ CLEAR TRANSCRIPT (C)
+• Clears all transcribed text from your responses area
+• Hotkey: Press 'C' key
+• Preserves AI feedback and screenshot analysis
+• Resets transcript for fresh input without losing AI responses
+
+⏸️ FREEZE (F)
+• Pauses all AI processing temporarily
+• Hotkey: Press 'F' key
+• Changes to "▶️ Unfreeze (F)" when active
+• Useful when you need to think without AI interference
+• Automatically freezes after screenshot analysis
+
+🎧 INTERVIEW MODE (I)
+• Toggles between normal and interview-optimized mode
+• Hotkey: Press 'I' key
+• Normal: "🎧 Start Listening (I)" - captures all audio
+• Active: "🔴 Interview Mode (I)" - optimized for speaker audio
+• Interview mode focuses on capturing interviewer questions
+
+📷 SCREENSHOT
+• Captures full screen and analyzes code/technical content
+• Hotkey: Press 'S' key
+• Temporarily hides application window for clean capture
+• Provides AI analysis of code, security vulnerabilities, and improvements
+• Automatically freezes display after analysis to review results
+
+🔝 ALWAYS ON TOP
+• Toggle switch to keep application window above all others
+• Enabled by default for seamless interview workflow
+• Useful during video interviews or while coding
+• Can be toggled on/off as needed
+
+🔑 ACTIVATE
+• License activation button
+• Enter license key in the text field and click to activate
+• Manages trial period and full license access
+• Required for continued use after trial expires
+
+═══════════════════════════════════════════════════════════════════
+8. AUDIO AND TRANSCRIPTION
+═══════════════════════════════════════════════════════════════════
+
+AUDIO SETUP:
+• The app automatically detects your default microphone
+• Ensure your microphone is working before starting
+• For interview calls, it can also capture speaker audio
+• Adjust system volume for optimal transcription
+
+TRANSCRIPTION ACCURACY:
+• Speak clearly and at moderate pace
+• Minimize background noise
+• Use technical terms confidently - the AI understands them
+• If transcription seems off, check microphone levels
+
+SUPPORTED AUDIO FORMATS:
+• Real-time microphone input
+• System speaker output (for interview calls)
+• Automatic format conversion
+• Noise reduction and audio enhancement
+
+
+═══════════════════════════════════════════════════════════════════
+9. AI ANALYSIS FEATURES
+═══════════════════════════════════════════════════════════════════
+
+DOMAIN-SPECIFIC EXPERTISE:
+
+📱 APPLICATION SECURITY:
+• Secure SDLC implementation
+• OWASP Top 10 vulnerabilities
+• Secure coding practices
+• API security testing
+• CI/CD security integration
+
+🔍 PENETRATION TESTING:
+• Web, network, mobile, cloud testing
+• Exploitation frameworks and tools
+• Post-exploitation techniques
+• Red team operations
+• Social engineering countermeasures
+
+⚙️ DEVSECOPS:
+• Security in CI/CD pipelines
+• Infrastructure as Code security
+• Container and Kubernetes security
+• Automated security testing
+• Secret management practices
+
+☁️ CLOUD SECURITY:
+• AWS, Azure, GCP best practices
+• Cloud infrastructure security
+• Serverless security considerations
+• Identity and access management
+• Data protection and encryption
+
+👨‍💻 SOFTWARE DEVELOPMENT:
+• Secure coding practices
+• Code quality and maintainability
+• Modern software architectures
+• Database design and optimization
+• API design best practices
+
+📋 GRC & AUDIT:
+• Regulatory frameworks (GDPR, HIPAA, PCI DSS)
+• Risk assessment methodologies
+• Security policies and procedures
+• Auditing processes and techniques
+• Compliance monitoring
+
+SCREENSHOT ANALYSIS CAPABILITIES:
+• Code extraction and formatting
+• Programming language identification
+• Security vulnerability detection
+• Best practice evaluation
+• Performance optimization suggestions
+• Real-world improvement recommendations
+
+═══════════════════════════════════════════════════════════════════
+10. LICENSE MANAGEMENT
+═══════════════════════════════════════════════════════════════════
+
+TRIAL VERSION:
+• Limited time (5 minutes) access to all features
+• Full AI analysis capabilities during trial
+• No feature restrictions during trial period
+• Trial status shown in the interface
+
+LICENSED VERSION:
+• Unlimited usage time
+• Access to premium AI models
+• Priority support
+• Regular updates and new features
+
+ACTIVATING LICENSE:
+1. Click the "🔑 Activate" button
+2. Enter your license key in the dialog box
+3. Click "OK" to validate
+4. Restart the application if required
+
+LICENSE STATUS INDICATORS:
+• "Trial started. Enjoy your time with GPT!" - Active trial
+• "Trial expired. Enter license key to continue." - Trial ended
+• "License expired. Enter a new license key to continue." - License renewal needed
+
+═══════════════════════════════════════════════════════════════════
+11. TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════
+
+COMMON ISSUES AND SOLUTIONS:
+
+🎤 NO AUDIO TRANSCRIPTION:
+• Check microphone permissions in Windows/macOS settings
+• Verify default recording device in Sound settings
+• Test microphone in other applications
+• Restart the application
+• Check if FFmpeg is installed and accessible
+
+❌ APPLICATION WON'T START:
+• Run as Administrator (Windows)
+• Check if all dependencies are installed
+• Verify Windows Defender isn't blocking the executable
+
+🔄 SLOW PERFORMANCE:
+• Close other resource-intensive applications
+• Check internet connection for AI features
+• Consider using a computer with more RAM
+
+🌐 AI RESPONSES NOT WORKING:
+• Check internet connection
+• Verify license status
+• Try restarting the application
+• Check if antivirus is blocking network access
+• Ensure firewall allows the application
+
+📱 SCREENSHOT ANALYSIS FAILED:
+• Try taking the screenshot again
+• Ensure the screen content is clearly visible
+• Check if image contains readable text/code
+• Verify internet connection for AI analysis
+• Close other applications that might interfere
+
+
+═══════════════════════════════════════════════════════════════════
+12. TIPS FOR BEST RESULTS
+═══════════════════════════════════════════════════════════════════
+
+🎯 INTERVIEW PREPARATION:
+• Choose the appropriate domain before starting
+• Practice in a quiet environment
+• Speak clearly and at moderate pace
+• Use the freeze function when thinking through complex problems
+• Take screenshots of code examples for detailed analysis
+
+📚 LEARNING OPTIMIZATION:
+• Review AI feedback carefully for learning opportunities
+• Practice with real interview questions from your target companies
+• Use different domains to broaden your knowledge
+• Take notes on important points the AI highlights
+• Practice explaining complex concepts clearly
+
+🔧 TECHNICAL SETUP:
+• Use a good quality microphone for better transcription
+• Ensure stable internet connection for AI features
+• Keep the application window visible during practice
+• Use "Always on Top" mode during video interviews
+• Close unnecessary applications to improve performance
+
+⚡ PERFORMANCE TIPS:
+• Use "Interview Mode" when only capturing speaker audio
+• Adjust update interval slider based on your needs
+• Clear transcript regularly to maintain performance
+• Restart the application periodically during long sessions
+
+📝 INTERVIEW STRATEGIES:
+• Use the app during mock interviews with friends
+• Practice explaining your thought process out loud
+• Take screenshots of coding challenges for detailed analysis
+• Use the freeze function to compose complex answers
+• Review and learn from the AI's expert responses
+
+═══════════════════════════════════════════════════════════════════
+
+KEYBOARD SHORTCUTS SUMMARY:
+• C - Clear Transcript
+• F - Freeze/Unfreeze  
+• I - Interview Mode Toggle
+• S - Screenshot Analysis

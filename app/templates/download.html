@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block title %}Download - CyberCrack{% endblock %}
+
+{% block content %}
+<style>
+    .download-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .hero-section {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-section h1 {
+        font-size: 3rem;
+        background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+    
+    .download-buttons {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+    }
+    
+    .download-btn {
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+        color: white;
+        padding: 1rem 2rem;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        box-shadow: 0 0 20px rgba(0, 180, 216, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .download-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 30px rgba(0, 180, 216, 0.8);
+    }
+    
+    .download-btn.secondary {
+        background: linear-gradient(45deg, var(--text-secondary), var(--secondary-bg));
+        border: 1px solid var(--neon-blue);
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin: 3rem 0;
+    }
+    
+    .info-card {
+        background: rgba(22, 27, 34, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+    }
+    
+    .info-card h3 {
+        color: var(--neon-blue);
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .feature-list li {
+        padding: 0.5rem 0;
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .feature-list li::before {
+        content: '✅';
+        position: absolute;
+        left: 0;
+        top: 0.5rem;
+    }
+    
+    .button-ref {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+    
+    .button-item {
+        background: rgba(0, 180, 216, 0.1);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .button-name {
+        font-weight: 600;
+        color: var(--neon-green);
+        margin-bottom: 0.5rem;
+    }
+    
+    .button-hotkey {
+        font-size: 0.9rem;
+        color: var(--neon-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .system-req {
+        background: rgba(89, 0, 255, 0.1);
+        border: 1px solid rgba(89, 0, 255, 0.3);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .req-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .req-category h4 {
+        color: var(--accent);
+        margin-bottom: 0.5rem;
+    }
+    
+    .installation-steps {
+        counter-reset: step-counter;
+    }
+    
+    .installation-steps li {
+        counter-increment: step-counter;
+        margin-bottom: 1rem;
+        padding-left: 3rem;
+        position: relative;
+    }
+    
+    .installation-steps li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 2rem;
+        height: 2rem;
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .download-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="download-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1>Download CyberCrack</h1>
+        <p class="lead">Advanced AI-powered cybersecurity interview trainer designed to help professionals and students excel in technical interviews.</p>
+        
+        <div class="download-buttons">
+            <a href="{{ url_for('main.download_file') }}" class="download-btn">
+                <i class="fas fa-download"></i>
+                Download CyberCrack.exe
+            </a>
+            <a href="{{ url_for('main.download_manual') }}" class="download-btn secondary">
+                <i class="fas fa-file-alt"></i>
+                Download User Manual
+            </a>
+        </div>
+    </div>
+
+    <!-- Application Overview -->
+    <div class="cyber-section">
+        <h2><i class="fas fa-shield-alt"></i> Application Overview</h2>
+        <p>CyberCrack Interview Trainer is an advanced AI-powered application designed to help cybersecurity professionals and students practice for technical interviews.</p>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Specialization Areas</h3>
+                <ul class="feature-list">
+                    <li>Cybersecurity and Application Security</li>
+                    <li>Penetration Testing</li>
+                    <li>DevSecOps and DevOps</li>
+                    <li>Cloud Security & Infrastructure</li>
+                    <li>Software Development Security</li>
+                    <li>Governance, Risk & Compliance (GRC)</li>
+                    <li>IT Audit and OWASP Top 10</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <h3>Key Capabilities</h3>
+                <ul class="feature-list">
+                    <li>Real-time audio recording and transcription</li>
+                    <li>AI-powered interview responses and feedback</li>
+                    <li>Screenshot analysis with code review</li>
+                    <li>Multiple domain-specific training modes</li>
+                    <li>Freeze/unfreeze functionality for focused practice</li>
+                    <li>Always-on-top mode for seamless workflow</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Requirements -->
+    <div class="cyber-section">
+        <h2><i class="fas fa-cogs"></i> System Requirements</h2>
+        <div class="system-req">
+            <div class="req-grid">
+                <div class="req-category">
+                    <h4>Operating System</h4>
+                    <ul>
+                        <li>Windows 10/11</li>
+                    </ul>
+                </div>
+                
+                <div class="req-category">
+                    <h4>Hardware</h4>
+                    <ul>
+                        <li>Minimum 8GB RAM (16GB recommended)</li>
+                        <li>1GB available disk space</li>
+                        <li>Microphone (built-in or external)</li>
+                        <li>Speakers or headphones</li>
+                        <li>Internet connection for AI features</li>
+                    </ul>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Installation Instructions -->
+    <div class="cyber-section">
+        <h2><i class="fas fa-download"></i> Installation Guide</h2>
+        <div class="info-card">
+            <h3>Executable Installation</h3>
+            <ol class="installation-steps">
+                <li>Download "CyberCrack.exe" from this page</li>
+                <li>Run the installer as Administrator</li>
+                <li>Follow the installation wizard</li>
+                <li>Launch "CyberCrack" from the Start Menu</li>
+            </ol>
+        </div>
+
+        <div class="info-card" style="margin-top: 2rem;">
+            <h3>Getting Started</h3>
+            <ol class="installation-steps">
+                <li>Start the application</li>
+                <li>The app will initialize audio systems automatically</li>
+                <li>Choose your preferred domain from the dropdown</li>
+                <li>Begin your interview practice session</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Button Reference -->
+    <div class="cyber-section">
+        <h2><i class="fas fa-keyboard"></i> Button Reference & Controls</h2>
+        <div class="button-ref">
+            <div class="button-item">
+                <div class="button-name">🗑️ Clear Transcript</div>
+                <div class="button-hotkey">Hotkey: C</div>
+                <p>Clears all transcribed text from responses area while preserving AI feedback.</p>
+            </div>
+            
+            <div class="button-item">
+                <div class="button-name">⏸️ Freeze/Unfreeze</div>
+                <div class="button-hotkey">Hotkey: F</div>
+                <p>Pauses all AI processing temporarily. Useful when you need to think without AI interference.</p>
+            </div>
+            
+            <div class="button-item">
+                <div class="button-name">🎧 Interview Mode</div>
+                <div class="button-hotkey">Hotkey: I</div>
+                <p>Toggles between normal and interview-optimized mode for capturing speaker audio.</p>
+            </div>
+            
+            <div class="button-item">
+                <div class="button-name">📷 Screenshot</div>
+                <div class="button-hotkey">Hotkey: S</div>
+                <p>Captures full screen and analyzes code/technical content with AI feedback.</p>
+            </div>
+            
+            <div class="button-item">
+                <div class="button-name">🔝 Always On Top</div>
+                <div class="button-hotkey">Toggle switch</div>
+                <p>Keeps application window above all others for seamless interview workflow.</p>
+            </div>
+            
+            <div class="button-item">
+                <div class="button-name">🔑 Activate</div>
+                <div class="button-hotkey">License activation</div>
+                <p>Enter license key to activate full version after trial period expires.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Deep Dive -->
+    <div class="cyber-section">
+        <h2><i class="fas fa-brain"></i> AI Analysis Features</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🎤 Audio System</h3>
+                <ul class="feature-list">
+                    <li>Real-time microphone capture</li>
+                    <li>Speaker audio recording (for calls)</li>
+                    <li>Automatic noise reduction</li>
+                    <li>Multiple audio device support</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <h3>📝 Transcription Engine</h3>
+                <ul class="feature-list">
+                    <li>Powered by OpenAI Whisper</li>
+                    <li>Real-time speech-to-text</li>
+                    <li>High accuracy for technical terms</li>
+                    <li>Multiple language support</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <h3>🤖 AI Analysis</h3>
+                <ul class="feature-list">
+                    <li>Expert-level cybersecurity responses</li>
+                    <li>Domain-specific knowledge base</li>
+                    <li>OWASP Top 10 coverage</li>
+                    <li>Real-world scenario examples</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <h3>📷 Screenshot Analysis</h3>
+                <ul class="feature-list">
+                    <li>Code vulnerability detection</li>
+                    <li>Security best practices</li>
+                    <li>Language identification</li>
+                    <li>Improvement recommendations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="cyber-section">
+        <h2><i class="fas fa-lightbulb"></i> Tips for Best Results</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🎯 Interview Preparation</h3>
+                <ul class="feature-list">
+                    <li>Choose appropriate domain before starting</li>
+                    <li>Practice in a quiet environment</li>
+                    <li>Speak clearly at moderate pace</li>
+                    <li>Use freeze function for complex problems</li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <h3>🔧 Technical Setup</h3>
+                <ul class="feature-list">
+                    <li>Use good quality microphone</li>
+                    <li>Ensure stable internet connection</li>
+                    <li>Keep application window visible</li>
+                    <li>Close unnecessary applications</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="cyber-section" style="text-align: center;">
+        <h2>Ready to Get Started?</h2>
+        <p>Download CyberCrack now and take your cybersecurity interview skills to the next level!</p>
+        <div class="download-buttons">
+            <a href="{{ url_for('main.download_file') }}" class="download-btn">
+                <i class="fas fa-download"></i>
+                Download Now
+            </a>
+            <a href="{{ url_for('main.purchase') }}" class="download-btn secondary">
+                <i class="fas fa-key"></i>
+                Get License
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
