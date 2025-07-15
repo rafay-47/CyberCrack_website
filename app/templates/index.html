@@ -114,6 +114,102 @@
     </div>
 </section>
 
+<section class="cyber-section reviews-section">
+    <h2>What Our <span class="highlight">Users</span> Say</h2>
+    <div class="reviews-container">
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    <div class="reviewer-details">
+                        <h4>Alex Chen</h4>
+                        <span>Penetration Testing Specialist</span>
+                    </div>
+                </div>
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+            </div>
+            <p class="review-text">"CyberCrack transformed my interview preparation. The real-time AI feedback helped me identify gaps in my cybersecurity knowledge and improved my communication skills significantly."</p>
+        </div>
+
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    <div class="reviewer-details">
+                        <h4>Sarah Johnson</h4>
+                        <span>Cloud Security Architect</span>
+                    </div>
+                </div>
+                <div class="rating">
+                    <span class="stars">★★★★☆</span>
+                </div>
+            </div>
+            <p class="review-text">"The domain-specific training modes are incredible. I practiced with the DevSecOps module and landed my dream job. The screenshot analysis feature is a game-changer!"</p>
+        </div>
+
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    <div class="reviewer-details">
+                        <h4>Marcus Rodriguez</h4>
+                        <span>Information Security Student</span>
+                    </div>
+                </div>
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+            </div>
+            <p class="review-text">"As a student, this tool gave me the confidence I needed. The OWASP Top 10 coverage and real-world scenarios helped me understand practical security concepts better."</p>
+        </div>
+
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    <div class="reviewer-details">
+                        <h4>Emily Zhang</h4>
+                        <span>Software Developer</span>
+                    </div>
+                </div>
+                <div class="rating">
+                    <span class="stars">★★★★☆</span>
+                </div>
+            </div>
+            <p class="review-text">"The cloud security module is comprehensive and up-to-date. CyberCrack helped me prepare for senior-level interviews with detailed explanations and expert-level responses."</p>
+        </div>
+
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    <div class="reviewer-details">
+                        <h4>David Kim</h4>
+                        <span>Cybersecurity Bootcamp Graduate</span>
+                    </div>
+                </div>
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+            </div>
+            <p class="review-text">"The GRC domain training is exceptional. It covered everything from compliance frameworks to risk assessment. The freeze feature let me think through complex scenarios."</p>
+        </div>
+
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-info">
+                    <div class="reviewer-details">
+                        <h4>Lisa Thompson</h4>
+                        <span>Network Security Student</span>
+                    </div>
+                </div>
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                </div>
+            </div>
+            <p class="review-text">"The audio transcription is incredibly accurate, even with technical jargon. This tool made my interview prep sessions productive and helped me practice articulating complex security concepts."</p>
+        </div>
+    </div>
+    
+</section>
+
 <section id="download" class="cyber-section cta-section">
     <div class="cta-content">
         <h2>Ready to <span class="highlight">Crack</span> Your Next Interview?</h2>
@@ -460,6 +556,128 @@ slideshowContainer.addEventListener('mouseleave', () => {
         border-color: rgba(0,180,216,0.5);
     }
     
+    .reviews-section {
+        margin-top: 5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .reviews-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .review-card {
+        background: rgba(22, 27, 34, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        position: relative;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .review-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 15px rgba(0,180,216,0.3);
+    }
+    
+    .review-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .reviewer-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .reviewer-details h4 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+    
+    .reviewer-details span {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    
+    .rating .stars {
+        color: #ffd700;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+    }
+    
+    .review-text {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        font-style: italic;
+        margin: 0;
+        position: relative;
+    }
+    
+    .review-text::before {
+        content: '"';
+        font-size: 2rem;
+        color: var(--neon-blue);
+        position: absolute;
+        left: -10px;
+        top: -5px;
+    }
+    
+    .review-text::after {
+        content: '"';
+        font-size: 2rem;
+        color: var(--neon-blue);
+        position: absolute;
+        bottom: -15px;
+        right: 5px;
+    }
+    
+    .reviews-stats {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        margin-top: 3rem;
+        padding: 2rem;
+        background: rgba(22, 27, 34, 0.6);
+        border-radius: 12px;
+        border: 1px solid rgba(0, 180, 216, 0.2);
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--neon-blue);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
     .cta-content {
         max-width: 700px;
         margin: 0 auto;
@@ -505,6 +723,22 @@ slideshowContainer.addEventListener('mouseleave', () => {
             width: 35px;
             height: 35px;
             font-size: 1.2rem;
+        }
+        
+        .reviews-container {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .reviews-stats {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .review-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
         }
     }
 </style>

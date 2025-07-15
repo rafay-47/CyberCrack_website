@@ -212,6 +212,16 @@
                 Download User Manual
             </a>
         </div>
+        
+        <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; border-radius: 8px; padding: 1rem; margin-top: 1rem; text-align: center;">
+            <p style="color: #ffa500; margin: 0; font-weight: 600;">
+                <i class="fas fa-exclamation-triangle"></i> 
+                If Windows shows an error while installing, 
+                <a href="#antivirus-exclusions" style="color: #00b4d8; text-decoration: underline; cursor: pointer;" onclick="document.getElementById('antivirus-exclusions').scrollIntoView({behavior: 'smooth'});">
+                    follow these antivirus exclusion steps
+                </a>
+            </p>
+        </div>
     </div>
 
     <!-- Application Overview -->
@@ -295,6 +305,33 @@
                 <li>The app will initialize audio systems automatically</li>
                 <li>Choose your preferred domain from the dropdown</li>
                 <li>Begin your interview practice session</li>
+            </ol>
+        </div>
+
+        <div class="info-card" id="antivirus-exclusions" style="margin-top: 2rem; border-color: #ff6b6b;">
+            <h3 style="color: #ff6b6b;"><i class="fas fa-exclamation-triangle"></i> IMPORTANT: Antivirus Exclusions</h3>
+            <p style="color: #ffa500; font-weight: 600; margin-bottom: 1rem;">
+                Some antivirus software may flag the executable as suspicious. Add CyberCrack.exe to your antivirus exclusions to prevent false positives.
+            </p>
+            
+            <h4 style="color: var(--neon-blue); margin-top: 1.5rem;">Windows Security (Windows Defender)</h4>
+            <ol class="installation-steps">
+                <li>Press ⊞ Win, type 'Windows Security', and press Enter</li>
+                <li>In the left‑hand menu, click 'Virus & threat protection'</li>
+                <li>Under 'Virus & threat protection settings', click 'Manage settings'</li>
+                <li>Scroll down to 'Exclusions' and click 'Add or remove exclusions'</li>
+                <li>Click 'Add an exclusion' ► 'File'. Browse to and select CyberCrack.exe, then click 'Open'</li>
+                <li>Verify the file is listed and close Windows Security</li>
+            </ol>
+
+            <h4 style="color: var(--neon-blue); margin-top: 1.5rem;">AVG Antivirus</h4>
+            <ol class="installation-steps">
+                <li>Double‑click the AVG icon in your system tray or open AVG from the Start menu</li>
+                <li>Click the Menu (☰) in the top‑right corner and choose 'Settings'</li>
+                <li>In the left pane, select 'General' ► 'Exceptions'</li>
+                <li>Click 'Add Exception'. Browse to and locate CyberCrack.exe, select it, and click 'OK'</li>
+                <li>Ensure the new exception appears, then click 'Add exception' (or 'OK') to confirm</li>
+                <li>Exit the Settings window; AVG will now ignore the file</li>
             </ol>
         </div>
     </div>
@@ -426,6 +463,15 @@
                 <i class="fas fa-key"></i>
                 Get License
             </a>
+        </div>
+        <div style="background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; border-radius: 8px; padding: 1rem; margin-top: 1rem; text-align: center;">
+            <p style="color: #ffa500; margin: 0; font-weight: 600;">
+                <i class="fas fa-exclamation-triangle"></i> 
+                If Windows shows an error while installing, 
+                <a href="#antivirus-exclusions" style="color: #00b4d8; text-decoration: underline; cursor: pointer;" onclick="document.getElementById('antivirus-exclusions').scrollIntoView({behavior: 'smooth'});">
+                    follow these antivirus exclusion steps
+                </a>
+            </p>
         </div>
     </div>
 </div>

@@ -8,14 +8,15 @@ TABLE OF CONTENTS
 1. Overview
 2. System Requirements
 3. Installation
-4. Getting Started
-5. Features and Functions
-6. Button Reference
-7. Audio and Transcription
-8. AI Analysis Features
-9. License Management
-10. Troubleshooting
-11. Tips for Best Results
+4. Antivirus Exclusion Steps
+5. Getting Started
+6. Features and Functions
+7. Button Reference
+8. Audio and Transcription
+9. AI Analysis Features
+10. License Management
+11. Troubleshooting
+12. Tips for Best Results
 
 ═══════════════════════════════════════════════════════════════════
 1. OVERVIEW
@@ -70,9 +71,43 @@ EXECUTABLE INSTALLATION
 3. Follow the installation wizard
 4. Launch "CyberCrack" from the Start Menu
 
+═══════════════════════════════════════════════════════════════════
+4. Antivirus Exclusion Steps
+═══════════════════════════════════════════════════════════════════
+
+Adding a File to Exclusions in Windows Security and AVG
+1. Windows Security (Windows Defender)
+Open Windows Security:
+- Press ⊞ Win, type 'Windows Security', and press Enter.
+Go to Virus & threat protection:
+- In the left‑hand menu, click 'Virus & threat protection'.
+Manage settings:
+- Under 'Virus & threat protection settings', click 'Manage settings'.
+Open Exclusions settings:
+- Scroll down to 'Exclusions' and click 'Add or remove exclusions'.
+Add a new exclusion:
+- Click 'Add an exclusion' ► 'File'. Browse to and select the file you want to exclude, then click 'Open'.
+Verify your exclusion:
+- You’ll see the file listed. Close the Windows Security window.
+
+2. AVG Antivirus
+Open the AVG user interface:
+- Double‑click the AVG icon in your system tray or open AVG from the Start menu.
+Access Settings:
+- Click the Menu (☰) in the top‑right corner and choose 'Settings'.
+Navigate to Exceptions:
+- In the left pane, select 'General' ► 'Exceptions'.
+Add a new exception:
+- Click 'Add Exception'. Browse to and locate the file you wish to exclude, select it, and click 'OK'.
+Save your changes:
+- Ensure the new exception appears, then click 'Add exception' (or 'OK') to confirm.
+Close AVG Settings:
+- Exit the Settings window; AVG will now ignore the file.
+
+
 
 ═══════════════════════════════════════════════════════════════════
-4. GETTING STARTED
+5. GETTING STARTED
 ═══════════════════════════════════════════════════════════════════
 
 FIRST LAUNCH:
