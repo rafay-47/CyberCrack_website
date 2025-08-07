@@ -1,13 +1,16 @@
-from flask import Blueprint, render_template, send_from_directory, redirect, url_for, request, flash, current_app, jsonify
+from flask import Blueprint, render_template, send_from_directory, redirect, url_for, request, flash, current_app, jsonify, Response
 import stripe
 import os
 from app.services.EmailService import EmailService
 from app.services.StripeCheckout import StripeCheckout
-from app.forms import PurchaseForm, ContactForm
+from app.forms import PurchaseForm, ContactForm, JobScrapingForm
 import jwt
 from datetime import datetime, timedelta
 from pathlib import Path
 import secrets
+import csv
+from jobspy import scrape_jobs
+import io
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -281,3 +284,127 @@ def contact():
             flash('There was an issue sending your message. Please try again later.', 'error')
     
     return render_template('contact.html', form=form)
+
+@main_blueprint.route('/jobs', methods=['GET', 'POST'])
+def jobs():
+    form = JobScrapingForm()
+    jobs_data = None
+    search_info = None
+
+    # Only process form on POST requests
+    if request.method == 'POST' and form.validate_on_submit():
+        print("Form submitted with data:", form.data)
+        try:
+            # Get form data
+            sites = form.get_selected_sites()
+            
+            # Validate that at least one site is selected
+            if not sites:
+                flash('Please select at least one job site.', 'error')
+                return render_template('jobs.html', form=form)
+            
+            # Mandatory parameters
+            search_term = form.search_term.data
+            location = form.location.data
+            results_wanted = form.results_wanted.data
+            
+            # Optional parameters
+            google_search_term = form.google_search_term.data or None
+            distance = form.distance.data if form.distance.data != 50 else None
+            job_type = form.job_type.data or None
+            is_remote = form.is_remote.data if form.is_remote.data else None
+            hours_old = form.hours_old.data if form.hours_old.data != 168 else None
+            easy_apply = form.easy_apply.data if form.easy_apply.data else None
+            description_format = form.description_format.data
+            offset = form.offset.data if form.offset.data != 0 else None
+            verbose = int(form.verbose.data)
+            
+            # LinkedIn specific parameters
+            linkedin_fetch_description = form.linkedin_fetch_description.data if form.linkedin_fetch_description.data else None
+            linkedin_company_ids = None
+            if form.linkedin_company_ids.data:
+                try:
+                    linkedin_company_ids = [int(x.strip()) for x in form.linkedin_company_ids.data.split(',') if x.strip()]
+                except ValueError:
+                    flash('Invalid LinkedIn company IDs format. Use comma-separated numbers.', 'error')
+                    return render_template('jobs.html', form=form)
+            
+            # Country parameter
+            country_indeed = form.country_indeed.data or None
+            
+            # Salary parameter
+            enforce_annual_salary = form.enforce_annual_salary.data if form.enforce_annual_salary.data else None
+            
+            # Proxy settings
+            proxies = None
+            if form.proxies.data:
+                proxies = [line.strip() for line in form.proxies.data.split('\n') if line.strip()]
+            
+            # User agent
+            user_agent = form.user_agent.data or None
+            
+            # Build parameters dict, excluding None values
+            params = {
+                'site_name': sites,
+                'search_term': search_term,
+                'location': location,
+                'results_wanted': results_wanted,
+                'description_format': description_format,
+                'verbose': verbose
+            }
+            
+            # Add optional parameters only if they have values
+            if google_search_term:
+                params['google_search_term'] = google_search_term
+            if distance:
+                params['distance'] = distance
+            if job_type:
+                params['job_type'] = job_type
+            if is_remote:
+                params['is_remote'] = is_remote
+            if hours_old:
+                params['hours_old'] = hours_old
+            if easy_apply:
+                params['easy_apply'] = easy_apply
+            if offset:
+                params['offset'] = offset
+            if linkedin_fetch_description:
+                params['linkedin_fetch_description'] = linkedin_fetch_description
+            if linkedin_company_ids:
+                params['linkedin_company_ids'] = linkedin_company_ids
+            if country_indeed:
+                params['country_indeed'] = country_indeed
+            if enforce_annual_salary:
+                params['enforce_annual_salary'] = enforce_annual_salary
+            if proxies:
+                params['proxies'] = proxies
+            if user_agent:
+                params['user_agent'] = user_agent
+            
+            print(f"JobSpy parameters: {params}")
+            
+            # Scrape jobs using jobspy
+            jobs = scrape_jobs(**params)
+
+            print(f"Scraped {len(jobs)} jobs from {sites} for '{search_term}' in '{location}'")
+            
+            # Convert DataFrame to list of dictionaries for template rendering
+            jobs_data = jobs.to_dict('records') if not jobs.empty else []
+            
+            # Store search information
+            search_info = {
+                'sites': sites,
+                'search_term': search_term,
+                'location': location,
+                'results_count': len(jobs_data),
+                'results_wanted': results_wanted,
+                'hours_old': hours_old
+            }
+            
+            flash(f'Successfully scraped {len(jobs_data)} jobs!', 'success')
+            
+        except Exception as e:
+            print(f"Error scraping jobs: {str(e)}")
+            flash(f'Error scraping jobs: {str(e)}', 'error')
+    
+    return render_template('jobs.html', form=form, jobs_data=jobs_data, search_info=search_info)

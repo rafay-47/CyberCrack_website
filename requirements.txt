@@ -9,3 +9,4 @@ mailersend
 Pyjwt
 python-dotenv
 email-validator
+python-jobspy

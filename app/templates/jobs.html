@@ -1,0 +1,741 @@
+{% extends "base.html" %}
+
+{% block title %}Job Scraper - CyberCrack{% endblock %}
+
+{% block content %}
+<style>
+    .jobs-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 0;
+    }
+
+    .jobs-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .jobs-header h1 {
+        font-size: 2.5rem;
+        background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .jobs-header p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+    }
+
+    .form-container {
+        background-color: var(--secondary-bg);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        margin-bottom: 2rem;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(0, 180, 216, 0.2);
+        border-radius: 8px;
+        background-color: rgba(22, 27, 34, 0.5);
+    }
+
+    .form-section h3 {
+        color: var(--neon-blue);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        border-bottom: 1px solid rgba(0, 180, 216, 0.3);
+        padding-bottom: 0.5rem;
+    }
+
+    .form-section.mandatory {
+        border-color: rgba(0, 255, 157, 0.3);
+    }
+
+    .form-section.mandatory h3 {
+        color: var(--neon-green);
+        border-bottom-color: rgba(0, 255, 157, 0.3);
+    }
+
+    .form-section.mandatory h3::after {
+        content: " *";
+        color: #ff6b6b;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 6px;
+        background-color: rgba(22, 27, 34, 0.8);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--neon-blue);
+        box-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
+        background-color: rgba(22, 27, 34, 1);
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+    }
+
+    .checkbox-item:hover {
+        background-color: rgba(0, 180, 216, 0.1);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--neon-blue);
+        cursor: pointer;
+    }
+
+    .checkbox-item label {
+        margin: 0;
+        font-weight: normal;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .collapsible-section {
+        margin-bottom: 1rem;
+    }
+
+    .collapsible-header {
+        background-color: rgba(0, 180, 216, 0.1);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 6px;
+        padding: 1rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .collapsible-header:hover {
+        background-color: rgba(0, 180, 216, 0.2);
+    }
+
+    .collapsible-header h3 {
+        margin: 0;
+        color: var(--neon-blue);
+    }
+
+    .collapsible-toggle {
+        font-size: 1.2rem;
+        color: var(--neon-blue);
+        transition: transform 0.3s ease;
+    }
+
+    .collapsible-content {
+        display: none;
+        padding: 1rem;
+        border: 1px solid rgba(0, 180, 216, 0.2);
+        border-top: none;
+        border-radius: 0 0 6px 6px;
+        background-color: rgba(22, 27, 34, 0.3);
+    }
+
+    .collapsible-section.active .collapsible-toggle {
+        transform: rotate(180deg);
+    }
+
+    .collapsible-section.active .collapsible-content {
+        display: block;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
+        font-family: 'Rajdhani', sans-serif;
+        position: relative;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 180, 216, 0.5);
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loading-content {
+        text-align: center;
+        color: var(--text-primary);
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(0, 180, 216, 0.3);
+        border-top: 3px solid var(--neon-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .limitations-box {
+        background-color: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .limitations-box h4 {
+        color: #ff6b6b;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .limitations-box ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .info-box {
+        background-color: rgba(0, 180, 216, 0.1);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-box h3 {
+        color: var(--neon-blue);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+    }
+
+    .info-box ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-box li {
+        padding: 0.3rem 0;
+        color: var(--text-secondary);
+    }
+
+    .info-box li::before {
+        content: "▸";
+        color: var(--neon-green);
+        margin-right: 0.5rem;
+        font-weight: bold;
+    }
+
+    /* Results styling */
+    .results-container {
+        margin-top: 3rem;
+        background-color: var(--secondary-bg);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .results-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 180, 216, 0.3);
+    }
+
+    .results-header h2 {
+        color: var(--neon-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .search-summary {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .search-summary span {
+        color: var(--neon-green);
+        font-weight: 600;
+    }
+
+    .jobs-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .job-card {
+        background-color: rgba(22, 27, 34, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.2);
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .job-card:hover {
+        border-color: var(--neon-blue);
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .job-title {
+        color: var(--neon-blue);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-decoration: none;
+    }
+
+    .job-title:hover {
+        color: var(--neon-green);
+    }
+
+    .job-company {
+        color: var(--text-primary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .job-location {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .job-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .job-detail {
+        font-size: 0.85rem;
+    }
+
+    .job-detail strong {
+        color: var(--neon-green);
+    }
+
+    .job-site {
+        display: inline-block;
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .job-description {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: 1rem;
+        line-height: 1.5;
+        max-height: 4.5em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .no-results {
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        padding: 3rem;
+    }
+
+    .flash-messages {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+    }
+
+    .flash-message {
+        margin-bottom: 10px;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .flash-success {
+        background: linear-gradient(135deg, #00ff9d, #00b4d8);
+        border-color: #00ff9d;
+    }
+
+    .flash-error {
+        background: linear-gradient(135deg, #ff6b6b, #ff4757);
+        border-color: #ff6b6b;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .jobs-container {
+            padding: 1rem;
+        }
+
+        .form-container {
+            padding: 1.5rem;
+        }
+
+        .form-row, .form-row-3 {
+            grid-template-columns: 1fr;
+        }
+
+        .checkbox-group {
+            grid-template-columns: 1fr;
+        }
+
+        .jobs-header h1 {
+            font-size: 2rem;
+        }
+    }
+
+</style>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="jobs-container">
+    <div class="jobs-header">
+        <h1>Job Scraper</h1>
+        <p>Search and scrape job listings from multiple platforms</p>
+    </div>
+
+    <div class="info-box">
+        <h3>🚀 How it works</h3>
+        <ul>
+            <li>Select job sites to search from (Indeed, LinkedIn, Glassdoor, Google Jobs, Bayt)</li>
+            <li>Enter your search terms and location preferences</li>
+            <li>Set the number of results and maximum job age</li>
+            <li>Download results as a CSV file for further analysis</li>
+        </ul>
+    </div>
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('main.jobs') }}" id="jobScrapingForm">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                <label class="form-label">Job Sites</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        {{ form.indeed(checked=true) }}
+                        {{ form.indeed.label }}
+                    </div>
+                    <div class="checkbox-item">
+                        {{ form.linkedin(checked=true) }}
+                        {{ form.linkedin.label }}
+                    </div>
+                    <div class="checkbox-item">
+                        {{ form.glassdoor() }}
+                        {{ form.glassdoor.label }}
+                    </div>
+                    <div class="checkbox-item">
+                        {{ form.google() }}
+                        {{ form.google.label }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.search_term.label }}
+                    {{ form.search_term(class="form-control", placeholder="e.g., software engineer") }}
+                </div>
+                <div class="form-group">
+                    {{ form.location.label }}
+                    {{ form.location(class="form-control", placeholder="e.g., Singapore") }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.google_search_term.label }}
+                {{ form.google_search_term(class="form-control", placeholder="e.g., software engineer jobs near Singapore since yesterday") }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form.results_wanted.label }}
+                    {{ form.results_wanted(class="form-control", min="1", max="1000") }}
+                </div>
+                <div class="form-group">
+                    {{ form.hours_old.label }}
+                    {{ form.hours_old(class="form-control", min="1", max="168") }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.country_indeed.label }}
+                {{ form.country_indeed(class="form-control", placeholder="e.g., Singapore") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.submit(class="submit-btn", id="submitBtn") }}
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Scraping Jobs...</div>
+            <div class="loading-subtext">This may take a few moments</div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    {% if jobs_data is not none %}
+        <div class="results-container">
+            <div class="results-header">
+                <h2>Search Results</h2>
+                {% if search_info %}
+                    <div class="search-summary">
+                        Found <span>{{ search_info.results_count }}</span> jobs for 
+                        "<span>{{ search_info.search_term }}</span>" in 
+                        "<span>{{ search_info.location }}</span>" from 
+                        <span>{{ search_info.sites|join(', ') }}</span>
+                        (last {{ search_info.hours_old }} hours)
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if jobs_data %}
+                <div class="jobs-grid">
+                    {% for job in jobs_data %}
+                        <div class="job-card">
+                            <div class="job-site">{{ job.site }}</div>
+                            {% if job.job_url %}
+                                <a href="{{ job.job_url }}" target="_blank" class="job-title">
+                                    {{ job.title or 'N/A' }}
+                                </a>
+                            {% else %}
+                                <div class="job-title">{{ job.title or 'N/A' }}</div>
+                            {% endif %}
+                            
+                            <div class="job-company">{{ job.company or 'N/A' }}</div>
+                            <div class="job-location">📍 {{ job.location or 'N/A' }}</div>
+                            
+                            <div class="job-details">
+                                {% if job.salary_min or job.salary_max %}
+                                    <div class="job-detail">
+                                        <strong>Salary:</strong> 
+                                        {% if job.salary_min and job.salary_max %}
+                                            ${{ job.salary_min }} - ${{ job.salary_max }}
+                                        {% elif job.salary_min %}
+                                            ${{ job.salary_min }}+
+                                        {% elif job.salary_max %}
+                                            Up to ${{ job.salary_max }}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if job.job_type %}
+                                    <div class="job-detail">
+                                        <strong>Type:</strong> {{ job.job_type }}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if job.date_posted %}
+                                    <div class="job-detail">
+                                        <strong>Posted:</strong> {{ job.date_posted }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if job.description %}
+                                <div class="job-description">
+                                    {{ job.description }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results">
+                    <p>No jobs found matching your criteria. Try adjusting your search parameters.</p>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Auto-close flash messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message, index) {
+            setTimeout(function() {
+                message.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(function() {
+                    message.remove();
+                }, 300);
+            }, 5000 + (index * 500)); // Stagger removal if multiple messages
+        });
+    });
+
+    // Add slide out animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Handle form submission with loading state
+    const form = document.getElementById('jobScrapingForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    form.addEventListener('submit', function(e) {
+        // Check if at least one job site is selected
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        const isAnyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        
+        if (!isAnyChecked) {
+            e.preventDefault();
+            alert('Please select at least one job site.');
+            return false;
+        }
+
+        // Show loading overlay
+        loadingOverlay.style.display = 'flex';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Scraping...';
+    });
+
+    // Hide loading overlay when page loads (in case of redirect back)
+    window.addEventListener('load', function() {
+        loadingOverlay.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Scrape Jobs';
+    });
+</script>
+{% endblock %}
