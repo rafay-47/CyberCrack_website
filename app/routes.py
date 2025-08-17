@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, send_from_directory, redirect, url_for, request, flash, current_app, jsonify, Response
+from flask import Blueprint, render_template, send_from_directory, redirect, url_for, request, flash, current_app, jsonify, Response, session
 import stripe
 import os
 from app.services.EmailService import EmailService
@@ -11,6 +11,8 @@ import secrets
 import csv
 from jobspy import scrape_jobs
 import io
+import urllib.parse
+import time
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -285,11 +287,97 @@ def contact():
     
     return render_template('contact.html', form=form)
 
+@main_blueprint.route('/test-linkedin')
+def test_linkedin():
+    """Test page for LinkedIn integration"""
+    return send_from_directory('.', 'linkedin_test.html')
+
+@main_blueprint.route('/jobs/retrieve', methods=['POST'])
+def retrieve_jobs():
+    """Retrieve jobs data from localStorage (sent from frontend)"""
+    try:
+        print("=== /jobs/retrieve endpoint called ===")
+        jobs_data = request.get_json()
+        print(f"Received jobs_data: {jobs_data}")
+        
+        if not jobs_data or 'jobs' not in jobs_data:
+            print("ERROR: No jobs data received or missing 'jobs' key")
+            return jsonify({'error': 'No jobs data received'}), 400
+        
+        # Process and validate the jobs data
+        jobs_list = jobs_data.get('jobs', [])
+        print(f"Jobs list length: {len(jobs_list)}")
+        
+        search_info = {
+            'search_term': jobs_data.get('searchTerm', ''),
+            'location': jobs_data.get('location', ''),
+            'sites': ['LinkedIn'],
+            'results_count': len(jobs_list),
+            'timestamp': jobs_data.get('timestamp'),
+            'scraped_from_extension': True
+        }
+        print(f"Search info: {search_info}")
+        
+        # Validate job data structure
+        validated_jobs = []
+        for i, job in enumerate(jobs_list):
+            print(f"Processing job {i+1}: {job.get('title', 'No title')} at {job.get('company', 'No company')}")
+            validated_job = {
+                'title': job.get('title', 'N/A'),
+                'company': job.get('company', 'N/A'),
+                'location': job.get('location', 'N/A'),
+                'job_url': job.get('job_url', '#'),
+                'description': job.get('description', ''),
+                'salary_min': job.get('salary_min'),
+                'salary_max': job.get('salary_max'),
+                'job_type': job.get('job_type', 'Not specified'),
+                'date_posted': job.get('date_posted', 'Recently'),
+                'site': 'LinkedIn'
+            }
+            validated_jobs.append(validated_job)
+        
+        # Store in session for display
+        session['scraped_jobs'] = validated_jobs
+        session['search_info'] = search_info
+        
+        print(f"Stored {len(validated_jobs)} jobs in session")
+        print("Session keys:", list(session.keys()))
+        
+        current_app.logger.info(f"Retrieved {len(validated_jobs)} jobs from extension")
+        
+        response_data = {
+            'success': True,
+            'jobs_count': len(validated_jobs),
+            'redirect_url': url_for('main.jobs')
+        }
+        print(f"Returning response: {response_data}")
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        print(f"ERROR in /jobs/retrieve: {str(e)}")
+        current_app.logger.error(f"Error retrieving jobs: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @main_blueprint.route('/jobs', methods=['GET', 'POST'])
 def jobs():
+    print("=== /jobs route called ===")
+    print(f"Request method: {request.method}")
+    print(f"Session keys: {list(session.keys())}")
+    
     form = JobScrapingForm()
     jobs_data = None
     search_info = None
+
+    # Check for retrieved jobs from session (from extension)
+    if 'scraped_jobs' in session:
+        print("Found scraped_jobs in session!")
+        jobs_data = session.pop('scraped_jobs')
+        search_info = session.pop('search_info')
+        print(f"Retrieved {len(jobs_data)} jobs from session")
+        flash(f'Successfully retrieved {len(jobs_data)} jobs from LinkedIn via Chrome extension!', 'success')
+    else:
+        print("No scraped_jobs found in session")
 
     # Only process form on POST requests
     if request.method == 'POST' and form.validate_on_submit():
@@ -298,9 +386,61 @@ def jobs():
             # Get form data
             sites = form.get_selected_sites()
             
-            # Validate that at least one site is selected
+            # Special case: If LinkedIn is selected, return LinkedIn URL for opening in new tab
+            if len(sites) == 1 and sites[0] == 'linkedin':
+                try:
+                    # Get search parameters from the form
+                    search_term = form.search_term.data or 'software engineer'
+                    location = form.location.data or 'Singapore'
+                    results_wanted = form.results_wanted.data or 50
+                    
+                    # Build LinkedIn jobs search URL with properly encoded parameters
+                    # Add custom parameters to trigger the extension
+                    # Use URL fragment (hash) instead of query params as it's more likely to be preserved
+                    base_url = (f"https://www.linkedin.com/jobs/search/"
+                              f"?keywords={urllib.parse.quote(search_term)}"
+                              f"&location={urllib.parse.quote(location)}")
+                    
+                    # Add CyberCrack trigger in the URL fragment
+                    fragment_data = {
+                        'cybercrack_scraper': 'true',
+                        'cybercrack_results': results_wanted,
+                        'cybercrack_search_term': search_term,
+                        'cybercrack_location': location,
+                        'cybercrack_timestamp': int(time.time())
+                    }
+                    
+                    fragment = '&'.join([f"{k}={urllib.parse.quote(str(v))}" for k, v in fragment_data.items()])
+                    linkedin_url = f"{base_url}#cybercrack-{fragment}"
+                    
+                    # Debug: Print the generated URL
+                    print(f"Generated LinkedIn URL: {linkedin_url}")
+                    print(f"Search term: {search_term}")
+                    print(f"Location: {location}")
+                    print(f"Results wanted: {results_wanted}")
+                    print(f"Is AJAX request: {request.headers.get('X-Requested-With') == 'XMLHttpRequest'}")
+                    
+                    # Check if this is an AJAX request
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        response_data = {'linkedin_url': linkedin_url}
+                        print(f"Returning JSON response: {response_data}")
+                        return jsonify(response_data)
+                    else:
+                        # Fallback: redirect if not AJAX request
+                        print(f"Redirecting to: {linkedin_url}")
+                        return redirect(linkedin_url)
+                        
+                except Exception as e:
+                    print(f"Error generating LinkedIn URL: {str(e)}")
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return jsonify({'error': f'Error generating LinkedIn URL: {str(e)}'}), 500
+                    else:
+                        flash(f'Error generating LinkedIn URL: {str(e)}', 'error')
+                        return render_template('jobs.html', form=form)
+            
+            # Validate that a site is selected
             if not sites:
-                flash('Please select at least one job site.', 'error')
+                flash('Please select a job site.', 'error')
                 return render_template('jobs.html', form=form)
             
             # Mandatory parameters
@@ -308,78 +448,15 @@ def jobs():
             location = form.location.data
             results_wanted = form.results_wanted.data
             
-            # Optional parameters
-            google_search_term = form.google_search_term.data or None
-            distance = form.distance.data if form.distance.data != 50 else None
-            job_type = form.job_type.data or None
-            is_remote = form.is_remote.data if form.is_remote.data else None
-            hours_old = form.hours_old.data if form.hours_old.data != 168 else None
-            easy_apply = form.easy_apply.data if form.easy_apply.data else None
-            description_format = form.description_format.data
-            offset = form.offset.data if form.offset.data != 0 else None
-            verbose = int(form.verbose.data)
-            
-            # LinkedIn specific parameters
-            linkedin_fetch_description = form.linkedin_fetch_description.data if form.linkedin_fetch_description.data else None
-            linkedin_company_ids = None
-            if form.linkedin_company_ids.data:
-                try:
-                    linkedin_company_ids = [int(x.strip()) for x in form.linkedin_company_ids.data.split(',') if x.strip()]
-                except ValueError:
-                    flash('Invalid LinkedIn company IDs format. Use comma-separated numbers.', 'error')
-                    return render_template('jobs.html', form=form)
-            
-            # Country parameter
-            country_indeed = form.country_indeed.data or None
-            
-            # Salary parameter
-            enforce_annual_salary = form.enforce_annual_salary.data if form.enforce_annual_salary.data else None
-            
-            # Proxy settings
-            proxies = None
-            if form.proxies.data:
-                proxies = [line.strip() for line in form.proxies.data.split('\n') if line.strip()]
-            
-            # User agent
-            user_agent = form.user_agent.data or None
-            
-            # Build parameters dict, excluding None values
+            # Build parameters dict for jobspy
             params = {
                 'site_name': sites,
                 'search_term': search_term,
                 'location': location,
                 'results_wanted': results_wanted,
-                'description_format': description_format,
-                'verbose': verbose
+                'description_format': 'markdown',
+                'verbose': 2
             }
-            
-            # Add optional parameters only if they have values
-            if google_search_term:
-                params['google_search_term'] = google_search_term
-            if distance:
-                params['distance'] = distance
-            if job_type:
-                params['job_type'] = job_type
-            if is_remote:
-                params['is_remote'] = is_remote
-            if hours_old:
-                params['hours_old'] = hours_old
-            if easy_apply:
-                params['easy_apply'] = easy_apply
-            if offset:
-                params['offset'] = offset
-            if linkedin_fetch_description:
-                params['linkedin_fetch_description'] = linkedin_fetch_description
-            if linkedin_company_ids:
-                params['linkedin_company_ids'] = linkedin_company_ids
-            if country_indeed:
-                params['country_indeed'] = country_indeed
-            if enforce_annual_salary:
-                params['enforce_annual_salary'] = enforce_annual_salary
-            if proxies:
-                params['proxies'] = proxies
-            if user_agent:
-                params['user_agent'] = user_agent
             
             print(f"JobSpy parameters: {params}")
             
@@ -397,8 +474,7 @@ def jobs():
                 'search_term': search_term,
                 'location': location,
                 'results_count': len(jobs_data),
-                'results_wanted': results_wanted,
-                'hours_old': hours_old
+                'results_wanted': results_wanted
             }
             
             flash(f'Successfully scraped {len(jobs_data)} jobs!', 'success')

@@ -12,3 +12,13 @@ class Config:
     PAYMENT_PROVIDER = os.environ.get('PAYMENT_PROVIDER', 'Stripe')
     DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     
+    # Add for production hosting
+    HOST_URL = os.environ.get('HOST_URL', 'http://localhost:5000')
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*')
+    
+    # Session configuration
+    SESSION_COOKIE_SECURE = not DEBUG  # Use secure cookies in production
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = 1800  # 30 minutes
+    
