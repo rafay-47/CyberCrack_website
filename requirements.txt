@@ -5,7 +5,7 @@ stripe
 paypalrestsdk
 gunicorn
 email-validator
-mailersend
+mailersend==0.5.0
 Pyjwt
 python-dotenv
 email-validator
