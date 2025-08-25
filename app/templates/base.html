@@ -140,6 +140,29 @@
             transform: translateY(-2px);
             box-shadow: 0 0 20px rgba(0, 180, 216, 0.8);
         }
+
+        /* Form submit buttons used across templates (e.g., .submit-btn) */
+        .submit-btn {
+            display: inline-block;
+            width: 100%;
+            max-width: 360px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+            color: white;
+            padding: 0.9rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 180, 216, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.45);
+        }
         
         footer {
             background-color: var(--secondary-bg);

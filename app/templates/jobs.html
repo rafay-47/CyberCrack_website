@@ -519,7 +519,7 @@
         <h1>Job Scraper</h1>
         <p>Search and scrape job listings from multiple platforms</p>
     </div>
-
+<!-- 
     <div class="info-box">
         <h3>🚀 How it works</h3>
         <ul>
@@ -528,32 +528,39 @@
             <li>Set the number of results and maximum job age</li>
             <li>Download results as a CSV file for further analysis</li>
         </ul>
-    </div>
+    </div> -->
 
     <div class="form-container">
         <form method="POST" action="{{ url_for('main.jobs') }}" id="jobScrapingForm">
             {{ form.hidden_tag() }}
             
-            <div class="form-group">
-                <label class="form-label">Job Sites</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        {{ form.indeed(checked=true) }}
-                        {{ form.indeed.label }}
-                    </div>
-                    <div class="checkbox-item">
-                        {{ form.linkedin(checked=true) }}
-                        {{ form.linkedin.label }}
-                    </div>
-                    <div class="checkbox-item">
-                        {{ form.glassdoor() }}
-                        {{ form.glassdoor.label }}
-                    </div>
-                    <div class="checkbox-item">
-                        {{ form.google() }}
-                        {{ form.google.label }}
-                    </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 1rem;">
+                <div style="flex: 1;">
+                    <label class="form-label" for="profile_select">Profile</label>
+                    <select class="form-control" id="profile_select" name="profile">
+                        {% if profiles %}
+                            {% for p in profiles %}
+                                {# Attach a JSON blob to each option to avoid serializing entire model list in JS #}
+                                <option value="{{ p.id }}" data-profile='{{ {"name": p.name, "headline": p.headline, "location": p.location, "skills": p.skills, "extracted_keywords": p.extracted_keywords}|tojson }}'>{{ p.resume_filename }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
                 </div>
+                <a href="{{ url_for('main.add_profile') }}" class="submit-btn" 
+                   style="width: auto; padding: 0.6rem 1.2rem; margin-top: 1.7rem; display: inline-block; text-align: center;">
+                    Add Profile
+                </a>
+
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="job_site_select">Job Site</label>
+                <select class="form-control" id="job_site_select" name="job_site">
+                    <option value="all">All Platforms</option>
+                    <option value="indeed">Indeed</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="glassdoor">Glassdoor</option>
+                    <option value="google">Google Jobs</option>
+                </select>
             </div>
 
             <div class="form-row">
@@ -568,24 +575,8 @@
             </div>
 
             <div class="form-group">
-                {{ form.google_search_term.label }}
-                {{ form.google_search_term(class="form-control", placeholder="e.g., software engineer jobs near Singapore since yesterday") }}
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    {{ form.results_wanted.label }}
-                    {{ form.results_wanted(class="form-control", min="1", max="1000") }}
-                </div>
-                <div class="form-group">
-                    {{ form.hours_old.label }}
-                    {{ form.hours_old(class="form-control", min="1", max="168") }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                {{ form.country_indeed.label }}
-                {{ form.country_indeed(class="form-control", placeholder="e.g., Singapore") }}
+                {{ form.results_wanted.label }}
+                {{ form.results_wanted(class="form-control", min="1", max="1000") }}
             </div>
 
             <div class="form-group">
@@ -667,6 +658,27 @@
                                     {{ job.description }}
                                 </div>
                             {% endif %}
+                            {% if job.extracted_skills %}
+                                <div style="margin-top:0.8rem;">
+                                    <strong>Skills:</strong>
+                                    <div style="margin-top:0.4rem; display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                        {% for s in job.extracted_skills[:8] %}
+                                            <span style="background:rgba(0,180,216,0.12); border:1px solid rgba(0,180,216,0.18); color:var(--neon-green); padding:0.25rem 0.5rem; border-radius:6px; font-size:0.8rem;">{{ s.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Compare button: posts job JSON and selected profile id to /job_detail -->
+                            <div style="margin-top:0.8rem; display:flex; gap:0.5rem; align-items:center;">
+                                <form method="POST" action="{{ url_for('main.job_detail') }}" style="display:inline; margin:0; padding:0;">
+                                    {{ form.hidden_tag() }}
+                                    <input type="hidden" name="job_json" value='{{ job|tojson }}'>
+                                    <input type="hidden" name="profile_id" id="compare_profile_{{ loop.index0 }}">
+                                    <button type="submit" class="submit-btn" style="padding:0.4rem 0.8rem; font-size:0.9rem;">Compare with Profile</button>
+                                </form>
+                                <div style="font-size:0.85rem; color:var(--text-secondary);">Select profile to compare using the selector at top of the page.</div>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
@@ -693,6 +705,52 @@
         });
     });
 
+    // Profiles data embedded for client-side population of search fields
+    // NOTE: profiles is a list of Profile model objects; we intentionally avoid calling tojson on the whole
+    // list because SQLAlchemy model instances are not JSON serializable. Instead each <option> contains
+    // a safe data-profile JSON attribute (see option rendering above). We'll use that per-option blob.
+    const profilesData = {}; // filled lazily from per-option data-profile
+
+    // Fill search fields when a profile is selected - read per-option data-profile JSON
+    function fillFieldsFromProfile(profileId) {
+        try {
+            if (!profileId) return;
+            const opt = document.querySelector('#profile_select option[value="' + profileId + '"]');
+            if (!opt) return;
+            let p = null;
+            try {
+                p = JSON.parse(opt.getAttribute('data-profile'));
+            } catch (e) {
+                p = null;
+            }
+            if (!p) {
+                console.debug('Profile option has no data-profile or JSON parse failed for id=', profileId, 'opt=', opt);
+                return;
+            }
+
+            // Append debug view of parsed profile JSON to the debug panel
+            const dbg = document.getElementById('profileDebug');
+            if (dbg) dbg.textContent = JSON.stringify(p, null, 2);
+
+            console.debug('fillFieldsFromProfile - parsed profile', p);
+
+            const searchField = document.querySelector('[name="search_term"]');
+            const locationField = document.querySelector('[name="location"]');
+
+            // Prefer headline, then extracted_keywords, then skills, then name
+            let searchVal = '';
+            if (p.headline) searchVal = p.headline;
+            else if (Array.isArray(p.extracted_keywords) && p.extracted_keywords.length) searchVal = p.extracted_keywords.slice(0,6).join(' ');
+            else if (Array.isArray(p.skills) && p.skills.length) searchVal = p.skills.slice(0,6).join(' ');
+            else if (p.name) searchVal = p.name;
+
+            if (searchField && searchVal) searchField.value = searchVal;
+            if (locationField && p.location) locationField.value = p.location;
+        } catch (e) {
+            console.error('fillFieldsFromProfile error', e);
+        }
+    }
+
     // Add slide out animation
     const style = document.createElement('style');
     style.textContent = `
@@ -714,22 +772,45 @@
     const submitBtn = document.getElementById('submitBtn');
     const loadingOverlay = document.getElementById('loadingOverlay');
 
-    form.addEventListener('submit', function(e) {
-        // Check if at least one job site is selected
-        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-        const isAnyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-        
-        if (!isAnyChecked) {
-            e.preventDefault();
-            alert('Please select at least one job site.');
-            return false;
+    // Wire up profile select to auto-fill fields
+    const profileSelect = document.getElementById('profile_select');
+    if (profileSelect) {
+        profileSelect.addEventListener('change', function(e) {
+            fillFieldsFromProfile(e.target.value);
+        });
+        // Populate initial values if an option is selected by default
+        if (profileSelect.value) {
+            fillFieldsFromProfile(profileSelect.value);
         }
+    }
 
+    form.addEventListener('submit', function(e) {
         // Show loading overlay
         loadingOverlay.style.display = 'flex';
         submitBtn.disabled = true;
         submitBtn.textContent = 'Scraping...';
     });
+
+    // Populate compare forms' hidden profile_id with currently selected profile
+    function populateCompareProfileInputs() {
+        const sel = document.getElementById('profile_select');
+        const val = sel ? sel.value : '';
+        document.querySelectorAll('input[name="profile_id"]').forEach(function(inp){ inp.value = val; });
+    }
+
+    // Attach to compare forms (delegate using capture on document)
+    const compareUrl = "{{ url_for('main.job_detail') }}";
+    document.addEventListener('submit', function(e){
+        const formEl = e.target;
+        try {
+            if (formEl && formEl.action && formEl.action.indexOf(compareUrl) !== -1) {
+                // ensure profile id populated
+                populateCompareProfileInputs();
+            }
+        } catch (err) {
+            // ignore
+        }
+    }, true);
 
     // Hide loading overlay when page loads (in case of redirect back)
     window.addEventListener('load', function() {

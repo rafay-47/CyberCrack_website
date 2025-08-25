@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Job / Profile Comparison - CyberCrack{% endblock %}
+
+{% block content %}
+<style>
+.compare-container { max-width:1100px; margin:2rem auto; display:grid; grid-template-columns: 1fr 1fr; gap:1rem; }
+.card { background:var(--secondary-bg); border:1px solid rgba(0,180,216,0.12); padding:1rem; border-radius:8px; }
+.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+.score-badge { background:linear-gradient(45deg,var(--neon-green),var(--neon-blue)); color:#001; padding:0.4rem 0.6rem; border-radius:6px; font-weight:700; }
+.list-inline { display:flex; gap:0.4rem; flex-wrap:wrap; }
+.token { background:rgba(0,180,216,0.08); padding:0.25rem 0.5rem; border-radius:6px; color:var(--neon-green); }
+.matched { background:linear-gradient(90deg, rgba(0,255,157,0.12), rgba(0,180,216,0.08)); border:1px solid rgba(0,255,157,0.18);} 
+.meta { font-size:0.9rem; color:var(--text-secondary); }
+@media (max-width:900px){ .compare-container{ grid-template-columns:1fr; } }
+</style>
+
+<div class="container" style="max-width:1100px; margin:2rem auto;">
+    <div class="header">
+        <h2>Job & Profile Comparison</h2>
+        <div class="score-badge">Score: {{ match.score }}%</div>
+    </div>
+
+    <div class="meta" style="margin-bottom:1rem;">
+        Matches: {{ match.match_count }} | Job skills: {{ match.job_skill_count }} | Profile skills: {{ match.profile_skill_count }}
+    </div>
+
+    <div class="compare-container">
+        <div class="card">
+            <h3>Job</h3>
+            <div style="margin-bottom:0.6rem;"><strong>{{ job.title or 'N/A' }}</strong> — <span class="meta">{{ job.company or '' }} • {{ job.location or '' }}</span></div>
+            {% if job.job_url %}
+                <div style="margin-bottom:0.8rem;"><a href="{{ job.job_url }}" target="_blank">Open original listing</a></div>
+            {% endif %}
+
+            <div style="margin-bottom:0.6rem;"><strong>Description</strong>
+                <div style="color:var(--text-secondary); margin-top:0.4rem; white-space:pre-wrap;">{{ job.description }}</div>
+            </div>
+
+            <div style="margin-top:0.6rem;"><strong>Extracted Skills</strong>
+                <div class="list-inline" style="margin-top:0.4rem;">
+                    {% for s in (job.extracted_skills or [])[:80] %}
+                        <span class="token">{{ s.name or s.surface_form or s }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Profile</h3>
+            {% if profile %}
+                <div style="margin-bottom:0.6rem;"><strong>{{ profile.name or profile.resume_filename }}</strong> — <span class="meta">{{ profile.headline or '' }} • {{ profile.location or '' }}</span></div>
+                <div style="margin-bottom:0.6rem;"><strong>Summary</strong>
+                    <div style="color:var(--text-secondary); margin-top:0.4rem; white-space:pre-wrap;">{{ profile.summary or 'No summary available.' }}</div>
+                </div>
+
+                <div style="margin-top:0.6rem;"><strong>Skills / Extracted Keywords</strong>
+                    <div class="list-inline" style="margin-top:0.4rem;">
+                        {% for s in (profile.skills or [])[:80] %}
+                            <span class="token">{{ s }}</span>
+                        {% endfor %}
+                        {% for s in (profile.extracted_keywords or [])[:80] %}
+                            <span class="token">{{ s }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div>No profile selected. You can add a profile first and try again.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="margin-top:1rem;">
+        <strong>Matched Keywords</strong>
+        <div class="list-inline" style="margin-top:0.6rem;">
+            {% if match.matched_skills %}
+                {% for m in match.matched_skills %}
+                    <span class="token matched">{{ m }}</span>
+                {% endfor %}
+            {% else %}
+                <div class="meta">No matching keywords found.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="margin-top:1.5rem; display:flex; gap:0.6rem;">
+        <a href="{{ url_for('main.jobs') }}" class="submit-btn" style="background:transparent; border:1px solid rgba(0,180,216,0.2); color:var(--neon-blue);">Back to results</a>
+        <a href="{{ url_for('main.add_profile') }}" class="submit-btn">Edit/Add Profile</a>
+    </div>
+</div>
+
+{% endblock %}

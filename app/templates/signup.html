@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - CyberCrack{% endblock %}
+
+{% block content %}
+<style>
+    .auth-wrapper { max-width:520px; margin:36px auto; }
+    .auth-card { background:var(--secondary-bg); border:1px solid rgba(0,180,216,0.12); padding:32px 28px; border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.45); }
+    .auth-header { text-align:center; margin-bottom:16px; }
+    .auth-header h2 { margin:0; color:var(--neon-blue); font-size:1.5rem; }
+    .form-group { margin-bottom:14px; }
+    label { display:block; margin-bottom:6px; color:var(--text-primary); font-weight:600; }
+    .form-control { box-sizing: border-box; width:100%; padding:12px 14px; border-radius:8px; border:1px solid rgba(0,180,216,0.12); background:rgba(22,27,34,0.6); color:var(--text-primary); }
+    .form-control::placeholder { color: rgba(142,158,171,0.5); }
+
+    .auth-card .submit-btn { max-width: none; width:100%; padding:12px 14px; border-radius:8px; font-size:1rem; background: linear-gradient(90deg, var(--neon-green), var(--neon-blue)); color:#001; box-shadow:0 8px 30px rgba(0,255,157,0.08); }
+    .form-control:focus { outline:none; box-shadow:0 0 10px rgba(0,180,216,0.08); border-color:var(--neon-blue); }
+    .auth-foot { text-align:center; margin-top:12px; color:var(--text-secondary); }
+    .auth-foot a { color:var(--neon-green); text-decoration:none; font-weight:600; }
+    @media (max-width:520px){ .auth-wrapper{ padding:0 12px } }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Create your CyberCrack Jobs account</h2>
+        </div>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.username.label }}
+                {{ form.username(class='form-control') }}
+            </div>
+            <div class="form-group">
+                {{ form.email.label }}
+                {{ form.email(class='form-control') }}
+            </div>
+            <div class="form-group">
+                {{ form.password.label }}
+                {{ form.password(class='form-control') }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class='submit-btn') }}
+            </div>
+        </form>
+        <div class="auth-foot">Already have an account? <a href="{{ url_for('main.login') }}">Sign in</a></div>
+    </div>
+</div>
+{% endblock %}
