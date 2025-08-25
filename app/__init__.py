@@ -1,34 +1,41 @@
 from flask import Flask
 from config import Config
+from app.models import db
+from flask_migrate import Migrate
+from flask_login import LoginManager
+import uuid
+
+# expose migrate instance at module level for flask CLI to import
+migrate = Migrate()
+# login manager
+login_manager = LoginManager()
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-    
-    # Add CORS and CSP headers to allow fetch requests
-    @app.after_request
-    def after_request(response):
-        # Add CORS headers
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-        
-        # Add CSP headers that allow same-origin fetch requests
-        csp_policy = (
-            "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-            "style-src 'self' 'unsafe-inline'; "
-            "img-src 'self' data: https:; "
-            "font-src 'self' data:; "
-            "connect-src 'self' http://127.0.0.1:8080 http://localhost:8080; "
-            "frame-src 'self';"
-        )
-        response.headers.add('Content-Security-Policy', csp_policy)
-        
-        return response
-    
+
+    # Initialize database
+    db.init_app(app)
+    # Initialize migrations
+    migrate.init_app(app, db)
+    # Initialize login manager
+    login_manager.init_app(app)
+    login_manager.login_view = 'main.login'
+    # user loader (deferred import to avoid circular)
+    from app.models import User
+    @login_manager.user_loader
+    def load_user(user_id):
+        # models use UUID primary keys; convert incoming id to uuid.UUID
+        try:
+            uid = uuid.UUID(user_id)
+        except (ValueError, TypeError):
+            return None
+        return User.query.get(uid)
+
     from app.routes import main_blueprint
     app.register_blueprint(main_blueprint)
-    
+
+    # Note: table creation/migrations should be handled externally (Flask-Migrate / Alembic)
+
     return app

@@ -1,0 +1,635 @@
+{% extends "base.html" %}
+
+{% block title %}Add Profile - CyberCrack{% endblock %}
+
+{% block content %}
+<style>
+    .add-profile-container {
+        max-width: 760px;
+        margin: 3rem auto;
+        padding: 1rem;
+    }
+
+    .add-profile-card {
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        background: linear-gradient(180deg, rgba(10,14,18,0.6), rgba(6,10,12,0.6));
+        border: 1px solid rgba(0,180,216,0.12);
+        backdrop-filter: blur(6px);
+    }
+
+    .add-profile-card h2 {
+        text-align: center;
+        margin-bottom: 1.6rem;
+        color: var(--neon-blue);
+        font-size: 1.6rem;
+        letter-spacing: 0.6px;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.4rem;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    /* Reuse site form-control but ensure padding and background look good here */
+    .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        border-radius: 8px;
+        border: 1px solid rgba(0,180,216,0.12);
+        background-color: rgba(22,27,34,0.85);
+        color: var(--text-primary);
+        box-sizing: border-box;
+    }
+
+    input[type="file"].form-control {
+        padding: 0.5rem 0.6rem;
+        height: auto;
+    }
+
+    textarea.form-control {
+        min-height: 140px;
+        resize: vertical;
+    }
+
+    .submit-row { text-align: center; margin-top: 1.5rem; }
+
+    .submit-btn {
+        width: 48%;
+        padding: 0.9rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+    }
+
+    /* Sections nav */
+    .sections-nav{
+        position: sticky;
+        top: 0.8rem;
+        z-index: 40;
+        background: linear-gradient(180deg, rgba(6,10,12,0.85), rgba(6,10,12,0.75));
+        border-radius: 10px;
+        padding: 0.4rem 0.6rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(0,180,216,0.08);
+        backdrop-filter: blur(6px);
+    }
+
+    .sections-inner{ display:flex; gap:0.5rem; overflow:auto; padding:0.2rem 0.4rem; }
+    .sections-link{
+        color: var(--text-primary);
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 700;
+        white-space: nowrap;
+        border: 1px solid transparent;
+    }
+    .sections-link.active{ background: linear-gradient(90deg, var(--neon-blue), var(--neon-green)); color:#001; }
+    .sections-link:focus{ outline: none; box-shadow: 0 0 0 3px rgba(0,180,216,0.12); }
+
+    /* Tab behavior: only active section is visible */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    @media (max-width: 720px) {
+        .add-profile-container { padding: 0 1rem; }
+        .submit-btn { width: 100%; }
+    }
+</style>
+
+<div class="add-profile-container">
+    <div class="add-profile-card">
+        <h2>Add / Edit Profile (Resume Sections)</h2>
+
+        <!-- Section navigation bar -->
+        <nav class="sections-nav" id="sectionsNav" aria-label="Profile sections">
+            <div class="sections-inner">
+                <a href="#personal-info" class="sections-link active">Personal</a>
+                <a href="#summary" class="sections-link">Summary</a>
+                <a href="#work-experience" class="sections-link">Work</a>
+                <a href="#education" class="sections-link">Education</a>
+                <a href="#skills" class="sections-link">Skills</a>
+                <a href="#projects" class="sections-link">Projects</a>
+                <a href="#extras" class="sections-link">Extras</a>
+            </div>
+        </nav>
+        <form method="POST" action="{{ url_for('main.add_profile') }}" enctype="multipart/form-data" id="profileForm">
+
+            <!-- Personal Info -->
+            <section class="section" id="personal-info">
+                <h3 class="section-title">Personal Information</h3>
+                <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label for="profile_name">Full Name</label>
+                        <input type="text" class="form-control" id="profile_name" name="profile_name" placeholder="e.g., John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="headline">Headline / Current Title</label>
+                        <input type="text" class="form-control" id="headline" name="headline" placeholder="e.g., Senior Software Engineer">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-top: 0.6rem;">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="e.g., john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone" placeholder="e.g., +1234567890">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-top:0.6rem;">
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" placeholder="e.g., Singapore">
+                    </div>
+                    <div class="form-group">
+                        <label for="resume">Upload Resume</label>
+                        <input type="file" class="form-control" id="resume" name="resume" accept=".pdf,.doc,.docx,.txt">
+                        <div style="margin-top:0.6rem; display:flex; gap:0.5rem;">
+                            <button type="button" class="submit-btn small" id="fillFromResumeBtn">Fill from Resume</button>
+                            <div id="parseStatus" style="align-self:center; color:var(--text-secondary); font-size:0.9rem;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Summary -->
+        <section class="section" id="summary">
+                <h3 class="section-title">Professional Summary</h3>
+                <div class="form-group">
+            <textarea class="form-control" id="summary_text" name="summary" rows="4" placeholder="A short professional summary..."></textarea>
+                </div>
+            </section>
+
+            <!-- Work Experience (repeatable) -->
+            <section class="section" id="work-experience">
+                <h3 class="section-title">Work Experience</h3>
+                <div id="workList">
+                    <!-- single work item template (will be cloned) -->
+                    <div class="work-item card-item">
+                        <div style="display:flex; gap: 1rem;">
+                            <div style="flex:1;">
+                                <label>Job Title</label>
+                                <input type="text" name="work_title[]" class="form-control" placeholder="e.g., Senior Engineer">
+                            </div>
+                            <div style="flex:1;">
+                                <label>Company</label>
+                                <input type="text" name="work_company[]" class="form-control" placeholder="e.g., Acme Corp">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:1rem; margin-top:0.6rem;">
+                            <input type="text" name="work_start[]" class="form-control" placeholder="Start (e.g., Jan 2020)">
+                            <input type="text" name="work_end[]" class="form-control" placeholder="End (e.g., Present)">
+                        </div>
+                        <div class="form-group" style="margin-top:0.6rem;">
+                            <label>Responsibilities / Achievements</label>
+                            <textarea name="work_description[]" class="form-control" rows="3" placeholder="Describe your role and achievements..."></textarea>
+                        </div>
+                        <div style="text-align:right; margin-top:0.5rem;">
+                            <button type="button" class="submit-btn small" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    </div>
+                    <!-- hidden template to always clone from when adding -->
+                    <div class="work-item card-item template" style="display:none;">
+                        <div style="display:flex; gap: 1rem;">
+                            <div style="flex:1;">
+                                <label>Job Title</label>
+                                <input type="text" name="work_title[]" class="form-control" placeholder="e.g., Senior Engineer">
+                            </div>
+                            <div style="flex:1;">
+                                <label>Company</label>
+                                <input type="text" name="work_company[]" class="form-control" placeholder="e.g., Acme Corp">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:1rem; margin-top:0.6rem;">
+                            <input type="text" name="work_start[]" class="form-control" placeholder="Start (e.g., Jan 2020)">
+                            <input type="text" name="work_end[]" class="form-control" placeholder="End (e.g., Present)">
+                        </div>
+                        <div class="form-group" style="margin-top:0.6rem;">
+                            <label>Responsibilities / Achievements</label>
+                            <textarea name="work_description[]" class="form-control" rows="3" placeholder="Describe your role and achievements..."></textarea>
+                        </div>
+                        <div style="text-align:right; margin-top:0.5rem;">
+                            <button type="button" class="submit-btn small" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:0.8rem;">
+                    <button type="button" class="submit-btn" onclick="addWork()">+ Add Work Item</button>
+                </div>
+            </section>
+
+            <!-- Education (repeatable) -->
+            <section class="section" id="education">
+                <h3 class="section-title">Education</h3>
+                <div id="eduList">
+                    <div class="edu-item card-item">
+                        <div style="display:flex; gap:1rem;">
+                            <input type="text" name="edu_school[]" class="form-control" placeholder="School / University">
+                            <input type="text" name="edu_degree[]" class="form-control" placeholder="Degree / Program">
+                        </div>
+                        <div style="display:flex; gap:1rem; margin-top:0.6rem;">
+                            <input type="text" name="edu_start[]" class="form-control" placeholder="Start (e.g., 2016)">
+                            <input type="text" name="edu_end[]" class="form-control" placeholder="End (e.g., 2020)">
+                        </div>
+                        <div class="form-group" style="margin-top:0.6rem;">
+                            <textarea name="edu_description[]" class="form-control" rows="2" placeholder="Optional details (thesis, honors, activities)"></textarea>
+                        </div>
+                        <div style="text-align:right; margin-top:0.5rem;">
+                            <button type="button" class="submit-btn small" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    </div>
+                    <div class="edu-item card-item template" style="display:none;">
+                        <div style="display:flex; gap:1rem;">
+                            <input type="text" name="edu_school[]" class="form-control" placeholder="School / University">
+                            <input type="text" name="edu_degree[]" class="form-control" placeholder="Degree / Program">
+                        </div>
+                        <div style="display:flex; gap:1rem; margin-top:0.6rem;">
+                            <input type="text" name="edu_start[]" class="form-control" placeholder="Start (e.g., 2016)">
+                            <input type="text" name="edu_end[]" class="form-control" placeholder="End (e.g., 2020)">
+                        </div>
+                        <div class="form-group" style="margin-top:0.6rem;">
+                            <textarea name="edu_description[]" class="form-control" rows="2" placeholder="Optional details (thesis, honors, activities)"></textarea>
+                        </div>
+                        <div style="text-align:right; margin-top:0.5rem;">
+                            <button type="button" class="submit-btn small" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:0.8rem;">
+                    <button type="button" class="submit-btn" onclick="addEdu()">+ Add Education</button>
+                </div>
+            </section>
+
+            <!-- Skills -->
+            <section class="section" id="skills">
+                <h3 class="section-title">Skills</h3>
+                <div style="display:flex; gap:0.6rem; align-items:center; margin-bottom:0.6rem;">
+                    <input type="text" id="skillInput" class="form-control" placeholder="Type a skill and press Add">
+                    <button type="button" class="submit-btn" onclick="addSkill()">Add</button>
+                </div>
+                <div id="skillsContainer" style="display:flex; gap:0.5rem; flex-wrap:wrap;"></div>
+            </section>
+
+            <!-- Projects -->
+            <section class="section" id="projects">
+                <h3 class="section-title">Projects</h3>
+                <div id="projectList">
+                    <div class="project-item card-item">
+                        <input type="text" name="project_title[]" class="form-control" placeholder="Project Title">
+                        <input type="text" name="project_link[]" class="form-control" placeholder="Optional link (GitHub, demo)">
+                        <div class="form-group" style="margin-top:0.6rem;">
+                            <textarea name="project_description[]" class="form-control" rows="3" placeholder="Describe the project..."></textarea>
+                        </div>
+                        <div style="text-align:right; margin-top:0.5rem;">
+                            <button type="button" class="submit-btn small" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    </div>
+                    <div class="project-item card-item template" style="display:none;">
+                        <input type="text" name="project_title[]" class="form-control" placeholder="Project Title">
+                        <input type="text" name="project_link[]" class="form-control" placeholder="Optional link (GitHub, demo)">
+                        <div class="form-group" style="margin-top:0.6rem;">
+                            <textarea name="project_description[]" class="form-control" rows="3" placeholder="Describe the project..."></textarea>
+                        </div>
+                        <div style="text-align:right; margin-top:0.5rem;">
+                            <button type="button" class="submit-btn small" onclick="removeItem(this)">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:0.8rem;">
+                    <button type="button" class="submit-btn" onclick="addProject()">+ Add Project</button>
+                </div>
+            </section>
+
+            <!-- Certifications & Languages & Links -->
+            <section class="section" id="extras">
+                <h3 class="section-title">Certifications</h3>
+                <div class="form-group">
+                    <input type="text" name="certification[]" class="form-control" placeholder="e.g., AWS Certified Solutions Architect">
+                </div>
+                <div style="margin-top:0.6rem;">
+                    <button type="button" class="submit-btn" onclick="addCertification(event)">+ Add Certification</button>
+                </div>
+
+                <h3 class="section-title" style="margin-top:1rem;">Languages</h3>
+                <div class="form-group">
+                    <input type="text" name="language[]" class="form-control" placeholder="e.g., English (Native)">
+                </div>
+                <div style="margin-top:0.6rem;">
+                    <button type="button" class="submit-btn" onclick="addLanguage(event)">+ Add Language</button>
+                </div>
+
+                <h3 class="section-title" style="margin-top:1rem;">Links</h3>
+                <div class="form-group">
+                    <input type="text" name="link[]" class="form-control" placeholder="e.g., https://github.com/username">
+                </div>
+        <div style="margin-top:0.6rem;">
+            <button type="button" class="submit-btn" onclick="addLink(event)">+ Add Link</button>
+        </div>
+            </section>
+
+            <div class="submit-row">
+                <button type="submit" class="submit-btn">Save Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    // Helpers to clone and add repeatable sections
+    function removeItem(btn){
+        const item = btn.closest('.card-item');
+        if(item){ item.remove(); }
+    }
+
+    function addWork(){
+    let tpl = document.querySelector('#workList .work-item.template');
+    if(!tpl){ tpl = document.querySelector('#workList .work-item'); }
+    const clone = tpl.cloneNode(true);
+        // clear inputs
+        clone.querySelectorAll('input, textarea').forEach(i => i.value = '');
+        clone.style.display = '';
+        clone.classList.remove('template');
+        document.getElementById('workList').appendChild(clone);
+    }
+
+    function addEdu(){
+    let tpl = document.querySelector('#eduList .edu-item.template');
+    if(!tpl){ tpl = document.querySelector('#eduList .edu-item'); }
+    const clone = tpl.cloneNode(true);
+        clone.querySelectorAll('input, textarea').forEach(i => i.value = '');
+        clone.style.display = '';
+        clone.classList.remove('template');
+        document.getElementById('eduList').appendChild(clone);
+    }
+
+    function addProject(){
+    let tpl = document.querySelector('#projectList .project-item.template');
+    if(!tpl){ tpl = document.querySelector('#projectList .project-item'); }
+    const clone = tpl.cloneNode(true);
+        clone.querySelectorAll('input, textarea').forEach(i => i.value = '');
+        clone.style.display = '';
+        clone.classList.remove('template');
+        document.getElementById('projectList').appendChild(clone);
+    }
+
+    function addCertification(e){
+        const input = document.createElement('input');
+        input.type = 'text'; input.name = 'certification[]'; input.className = 'form-control'; input.placeholder = 'Certification name';
+        const container = document.createElement('div'); container.className = 'form-group'; container.style.marginTop = '0.5rem'; container.appendChild(input);
+        const target = e && e.target ? e.target : window.event && window.event.target;
+        if(target && target.parentNode){
+            const btn = target.parentNode.querySelector('button');
+            const ref = btn ? btn.parentNode : null;
+            // Always append to avoid insertBefore errors when DOM structure is unpredictable
+            target.parentNode.appendChild(container);
+        }
+    }
+
+    function addLanguage(e){
+        const input = document.createElement('input');
+        input.type = 'text'; input.name = 'language[]'; input.className = 'form-control'; input.placeholder = 'Language (proficiency)';
+        const container = document.createElement('div'); container.className = 'form-group'; container.style.marginTop = '0.5rem'; container.appendChild(input);
+        const target = e && e.target ? e.target : window.event && window.event.target;
+        if(target && target.parentNode){
+            const btn = target.parentNode.querySelector('button');
+            const ref = btn ? btn.parentNode : null;
+            // Always append to avoid insertBefore errors when DOM structure is unpredictable
+            target.parentNode.appendChild(container);
+        }
+    }
+
+    function addLink(e){
+        const input = document.createElement('input');
+        input.type = 'text'; input.name = 'link[]'; input.className = 'form-control'; input.placeholder = 'Link URL';
+        const container = document.createElement('div'); container.className = 'form-group'; container.style.marginTop = '0.5rem'; container.appendChild(input);
+        const target = e && e.target ? e.target : window.event && window.event.target;
+        if(target && target.parentNode){
+            const btn = target.parentNode.querySelector('button');
+            const ref = btn ? btn.parentNode : null;
+            // Always append to avoid insertBefore errors when DOM structure is unpredictable
+            target.parentNode.appendChild(container);
+        }
+    }
+
+    // Skills tag input
+    function addSkill(){
+        const input = document.getElementById('skillInput');
+        const val = input.value.trim();
+        if(!val) return;
+        const chip = document.createElement('div');
+        chip.className = 'skill-chip';
+        chip.textContent = val;
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden'; hidden.name = 'skill[]'; hidden.value = val;
+        const removeBtn = document.createElement('button'); removeBtn.type='button'; removeBtn.className='small'; removeBtn.textContent='x';
+        removeBtn.onclick = function(){ chip.remove(); hidden.remove(); };
+        chip.appendChild(removeBtn);
+        document.getElementById('skillsContainer').appendChild(hidden);
+        document.getElementById('skillsContainer').appendChild(chip);
+        input.value='';
+    }
+
+    // Tab-style behavior: show only the selected section
+    document.addEventListener('DOMContentLoaded', function(){
+        const links = document.querySelectorAll('.sections-link');
+        const sections = document.querySelectorAll('.section');
+
+        function showSectionById(id){
+            sections.forEach(s => s.classList.remove('active'));
+            links.forEach(l => l.classList.remove('active'));
+            const sec = document.getElementById(id);
+            const link = document.querySelector('.sections-link[href="#'+id+'"]');
+            if(sec) sec.classList.add('active');
+            if(link) link.classList.add('active');
+        }
+
+        links.forEach(link => {
+            link.addEventListener('click', function(e){
+                e.preventDefault();
+                const href = this.getAttribute('href').replace('#','');
+                showSectionById(href);
+                // focus first input in section
+                const sec = document.getElementById(href);
+                if(sec) setTimeout(()=>{ const f = sec.querySelector('input, textarea'); if(f) f.focus(); }, 100);
+            });
+        });
+
+        // Initialize: show the first section (Personal) or the one with active link
+        const initial = document.querySelector('.sections-link.active')?.getAttribute('href')?.replace('#','') || 'personal-info';
+        showSectionById(initial);
+    });
+
+    // Fill profile from resume
+    document.addEventListener('DOMContentLoaded', function(){
+        const btn = document.getElementById('fillFromResumeBtn');
+        const resumeInput = document.getElementById('resume');
+        const statusEl = document.getElementById('parseStatus');
+
+        if(btn){
+            btn.addEventListener('click', async function(){
+                const file = resumeInput.files[0];
+                if(!file){ statusEl.textContent = 'Please choose a resume file first.'; return; }
+                statusEl.textContent = 'Parsing...';
+                const form = new FormData();
+                form.append('resume', file);
+                try{
+                    const res = await fetch("{{ url_for('main.parse_resume_route') }}", { method: 'POST', body: form });
+                    const data = await res.json();
+                    if(!res.ok){ statusEl.textContent = data.error || 'Error parsing resume'; return; }
+                    statusEl.textContent = 'Parsed — filling fields';
+                    const d = data.data || {};
+                    if(d.name) document.getElementById('profile_name').value = d.name;
+                    if(d.email) document.getElementById('email').value = d.email;
+                    if(d.phone) document.getElementById('phone').value = d.phone;
+                    if(d.headline) document.getElementById('headline').value = d.headline;
+                    if(d.location) document.getElementById('location').value = d.location;
+                    if(d.summary) {
+                        const sEl = document.getElementById('summary_text') || document.getElementById('summary');
+                        if(sEl) sEl.value = d.summary;
+                    }
+
+                    // skills
+                    if(Array.isArray(d.skills) && d.skills.length){
+                        const skillsContainer = document.getElementById('skillsContainer');
+                        skillsContainer.innerHTML = '';
+                        d.skills.forEach(s => {
+                            const chip = document.createElement('div'); chip.className='skill-chip'; chip.textContent = s;
+                            const hidden = document.createElement('input'); hidden.type='hidden'; hidden.name='skill[]'; hidden.value = s;
+                            const removeBtn = document.createElement('button'); removeBtn.type='button'; removeBtn.className='small'; removeBtn.textContent='x';
+                            removeBtn.onclick = function(){ chip.remove(); hidden.remove(); };
+                            chip.appendChild(removeBtn);
+                            skillsContainer.appendChild(hidden); skillsContainer.appendChild(chip);
+                        });
+                    }
+
+                    // Helper to populate repeatable lists from parsed arrays
+                    function populateList(listId, templateSelector, mapper){
+                        const list = document.getElementById(listId);
+                        if(!list) return;
+                        // remove all non-template children
+                        Array.from(list.children).forEach(ch => { if(!ch.classList.contains('template')) ch.remove(); });
+                        const tpl = list.querySelector(templateSelector) || list.firstElementChild;
+                        if(!tpl) return;
+                        return function(items){
+                            if(!Array.isArray(items)) return;
+                            items.forEach(it => {
+                                const clone = tpl.cloneNode(true);
+                                clone.style.display = '';
+                                clone.classList.remove('template');
+                                // fill fields inside clone using mapper
+                                try{ mapper(clone, it); }catch(e){ console.error('populate error', e); }
+                                list.appendChild(clone);
+                            });
+                        };
+                    }
+
+                    // Work experience
+                    const addWorkItems = populateList('workList', '.work-item.template', function(clone, item){
+                        // tolerate alternate keys
+                        const title = item.title || item.name || item.position || item.role || '';
+                        const company = item.company || item.employer || item.organization || item.org || '';
+                        const start = item.start || item.start_date || item.from || item.date || item.date_range || item.period || '';
+                        const end = item.end || item.end_date || item.to || item.to_date || '';
+                        const desc = item.description || item.summary || item.responsibilities || item.details || item.bullets || '';
+                        if(title) clone.querySelector('input[name="work_title[]"]').value = title;
+                        if(company) clone.querySelector('input[name="work_company[]"]').value = company;
+                        if(start) clone.querySelector('input[name="work_start[]"]').value = start;
+                        if(end) clone.querySelector('input[name="work_end[]"]').value = end;
+                        if(desc) clone.querySelector('textarea[name="work_description[]"]').value = Array.isArray(desc) ? desc.join('\n') : desc;
+                    });
+                    if(addWorkItems && Array.isArray(d.work_experience)) addWorkItems(d.work_experience);
+
+                    // Education
+                    const addEduItems = populateList('eduList', '.edu-item.template', function(clone, item){
+                        const school = item.school || item.institution || item.university || item.college || item.organization || '';
+                        const degree = item.degree || item.program || item.qualification || '';
+                        const start = item.start || item.start_date || item.from || item.date || item.date_range || '';
+                        const end = item.end || item.end_date || item.to || '';
+                        const desc = item.description || item.details || item.notes || '';
+                        if(school) clone.querySelector('input[name="edu_school[]"]').value = school;
+                        if(degree) clone.querySelector('input[name="edu_degree[]"]').value = degree;
+                        if(start) clone.querySelector('input[name="edu_start[]"]').value = start;
+                        if(end) clone.querySelector('input[name="edu_end[]"]').value = end;
+                        if(desc) clone.querySelector('textarea[name="edu_description[]"]').value = Array.isArray(desc) ? desc.join('\n') : desc;
+                    });
+                    if(addEduItems && Array.isArray(d.education)) addEduItems(d.education);
+
+                    // Projects
+                    const addProjectItems = populateList('projectList', '.project-item.template', function(clone, item){
+                        const title = item.title || item.name || '';
+                        const link = item.link || item.url || item.repo || '';
+                        const desc = item.description || item.summary || item.details || item.bullets || item.achievements || '';
+                        if(title) clone.querySelector('input[name="project_title[]"]').value = title;
+                        if(link) clone.querySelector('input[name="project_link[]"]').value = link;
+                        if(desc) clone.querySelector('textarea[name="project_description[]"]').value = Array.isArray(desc) ? desc.join('\n') : desc;
+                    });
+                    if(addProjectItems && Array.isArray(d.projects)) addProjectItems(d.projects);
+
+                    // Certifications
+                    if(Array.isArray(d.certifications)){
+                        const container = document.querySelector('#extras');
+                        // remove existing certification inputs (but keep the first default)
+                        const existing = Array.from(container.querySelectorAll('input[name="certification[]"]'));
+                        existing.forEach((el,i)=>{ if(i>0) el.parentNode.remove(); else el.value = ''; });
+                        d.certifications.forEach((c, idx)=>{
+                            if(idx===0){ if(existing[0]) existing[0].value = c; return; }
+                            const input = document.createElement('input'); input.type='text'; input.name='certification[]'; input.className='form-control'; input.value = c;
+                            const wrapper = document.createElement('div'); wrapper.className='form-group'; wrapper.style.marginTop = '0.5rem'; wrapper.appendChild(input);
+                            const parent = container.querySelector('h3.section-title').parentNode;
+                            const btn = container.querySelector('button');
+                            const ref = btn ? btn.parentNode : null;
+                            // Append wrapper to parent to avoid insertBefore parent-child mismatch
+                            parent.appendChild(wrapper);
+                        });
+                    }
+
+                    // Languages
+                    if(Array.isArray(d.languages)){
+                        const container = document.querySelector('#extras');
+                        const existing = Array.from(container.querySelectorAll('input[name="language[]"]'));
+                        existing.forEach((el,i)=>{ if(i>0) el.parentNode.remove(); else el.value = ''; });
+                        d.languages.forEach((l, idx)=>{
+                            if(idx===0){ if(existing[0]) existing[0].value = l; return; }
+                            const input = document.createElement('input'); input.type='text'; input.name='language[]'; input.className='form-control'; input.value = l;
+                            const wrapper = document.createElement('div'); wrapper.className='form-group'; wrapper.style.marginTop = '0.5rem'; wrapper.appendChild(input);
+                            const parent = container.querySelector('h3.section-title').parentNode;
+                            const btn = container.querySelector('button');
+                            const ref = btn ? btn.parentNode : null;
+                            // Append wrapper to parent to avoid insertBefore parent-child mismatch
+                            parent.appendChild(wrapper);
+                        });
+                    }
+
+                    // Links
+                    if(Array.isArray(d.links) && d.links.length){
+                        const container = document.querySelector('#extras');
+                        const existing = Array.from(container.querySelectorAll('input[name="link[]"]'));
+                        existing.forEach((el,i)=>{ if(i>0) el.parentNode.remove(); else el.value = ''; });
+                        d.links.forEach((lnk, idx)=>{
+                            if(idx===0){ if(existing[0]) existing[0].value = lnk; return; }
+                            const input = document.createElement('input'); input.type='text'; input.name='link[]'; input.className='form-control'; input.value = lnk;
+                            const wrapper = document.createElement('div'); wrapper.className='form-group'; wrapper.style.marginTop = '0.5rem'; wrapper.appendChild(input);
+                            const parent = container.querySelector('h3.section-title').parentNode;
+                            const btn = container.querySelector('button');
+                            const ref = btn ? btn.parentNode : null;
+                            // Append wrapper to parent to avoid insertBefore parent-child mismatch
+                            parent.appendChild(wrapper);
+                        });
+                    }
+
+                    setTimeout(()=> statusEl.textContent = '', 3000);
+                }catch(err){ statusEl.textContent = 'Error: '+err.message; }
+            });
+        }
+    });
+</script>
+{% endblock %}
