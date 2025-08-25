@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 from fastapi.concurrency import run_in_threadpool
 
 from groq import Groq
-from sentence_transformers import SentenceTransformer
+#from sentence_transformers import SentenceTransformer
 
 from ..agents.exceptions import ProviderError
 from .base import Provider, EmbeddingProvider
@@ -45,48 +45,48 @@ class GroqProvider(Provider):
         return await run_in_threadpool(self._generate_sync, prompt, opts)
 
 
-class GroqEmbeddingProvider(EmbeddingProvider):
-    def __init__(
-        self,
-        api_key: str | None = None,
-        embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
-    ):
-        """
-        Groq doesn't provide embeddings directly, so we use sentence-transformers
-        locally for fast and reliable embeddings.
-        """
-        self._model_name = embedding_model
-        self._model = None  # Lazy load the model
-        logger.info(f"Initialized GroqEmbeddingProvider with model: {embedding_model}")
+# class GroqEmbeddingProvider(EmbeddingProvider):
+#     def __init__(
+#         self,
+#         api_key: str | None = None,
+#         embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
+#     ):
+#         """
+#         Groq doesn't provide embeddings directly, so we use sentence-transformers
+#         locally for fast and reliable embeddings.
+#         """
+#         self._model_name = embedding_model
+#         self._model = None  # Lazy load the model
+#         logger.info(f"Initialized GroqEmbeddingProvider with model: {embedding_model}")
 
-    def _load_model(self):
-        """Lazy load the sentence transformer model"""
-        if self._model is None:
-            logger.info(f"Loading sentence transformer model: {self._model_name}")
-            try:
-                self._model = SentenceTransformer(self._model_name, trust_remote_code=True)
-                logger.info(f"Successfully loaded model: {self._model_name}")
-            except Exception as e:
-                logger.error(f"Failed to load model {self._model_name}: {e}")
-                raise ProviderError(f"Failed to load embedding model: {e}")
-        return self._model
+#     def _load_model(self):
+#         """Lazy load the sentence transformer model"""
+#         if self._model is None:
+#             logger.info(f"Loading sentence transformer model: {self._model_name}")
+#             try:
+#                 self._model = SentenceTransformer(self._model_name, trust_remote_code=True)
+#                 logger.info(f"Successfully loaded model: {self._model_name}")
+#             except Exception as e:
+#                 logger.error(f"Failed to load model {self._model_name}: {e}")
+#                 raise ProviderError(f"Failed to load embedding model: {e}")
+#         return self._model
 
-    def _embed_sync(self, text: str) -> List[float]:
-        """
-        Generate embeddings using sentence-transformers locally
-        """
-        try:
-            model = self._load_model()
-            # Generate embedding for single text
-            embedding = model.encode([text], convert_to_numpy=True)
-            # Return as a list of floats
-            return embedding[0].tolist()
-        except Exception as e:
-            logger.error(f"Local embedding error: {e}")
-            raise ProviderError(f"Local embedding - error generating embedding: {e}")
+#     def _embed_sync(self, text: str) -> List[float]:
+#         """
+#         Generate embeddings using sentence-transformers locally
+#         """
+#         try:
+#             model = self._load_model()
+#             # Generate embedding for single text
+#             embedding = model.encode([text], convert_to_numpy=True)
+#             # Return as a list of floats
+#             return embedding[0].tolist()
+#         except Exception as e:
+#             logger.error(f"Local embedding error: {e}")
+#             raise ProviderError(f"Local embedding - error generating embedding: {e}")
 
-    async def embed(self, text: str) -> List[float]:
-        """
-        Generate an embedding for the given text using local sentence-transformers
-        """
-        return await run_in_threadpool(self._embed_sync, text)
+#     async def embed(self, text: str) -> List[float]:
+#         """
+#         Generate an embedding for the given text using local sentence-transformers
+#         """
+#         return await run_in_threadpool(self._embed_sync, text)

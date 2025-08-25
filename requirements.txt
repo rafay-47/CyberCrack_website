@@ -17,7 +17,6 @@ PyMuPDF==1.26.3
 psycopg2-binary==2.9.10
 Flask-Migrate==4.1.0
 Flask-Login==0.6.3
-sentence-transformers==5.1.0
 groq==0.29.0
 fastapi==0.116.1
 Werkzeug==3.1.3
