@@ -45,7 +45,7 @@ class JobScrapingForm(FlaskForm):
                           validators=[validators.DataRequired()],
                           render_kw={'placeholder': 'e.g., Singapore, New York, London'})
     results_wanted = IntegerField('Number of Results', 
-                                 default=50,
+                                 default=5,
                                  validators=[validators.DataRequired(), validators.NumberRange(min=1, max=500)],
                                  render_kw={'placeholder': '1-500'})
     submit = SubmitField('Scrape Jobs')

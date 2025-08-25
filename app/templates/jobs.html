@@ -101,6 +101,40 @@
         background-color: rgba(22, 27, 34, 1);
     }
 
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+    }
+
+    .checkbox-item:hover {
+        background-color: rgba(0, 180, 216, 0.1);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--neon-blue);
+        cursor: pointer;
+    }
+
+    .checkbox-item label {
+        margin: 0;
+        font-weight: normal;
+        cursor: pointer;
+        user-select: none;
+    }
+
     .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -187,15 +221,6 @@
     .submit-btn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
-    }
-
-    .linkedin-mode {
-        background: linear-gradient(45deg, #0077b5, #005885) !important;
-    }
-
-    .linkedin-mode:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 119, 181, 0.5);
     }
 
     .loading-overlay {
@@ -465,49 +490,16 @@
             grid-template-columns: 1fr;
         }
 
+        .checkbox-group {
+            grid-template-columns: 1fr;
+        }
+
         .jobs-header h1 {
             font-size: 2rem;
         }
     }
 
-    /* Extension status styling */
-    .extension-status {
-        background: rgba(0, 255, 157, 0.1);
-        border: 1px solid rgba(0, 255, 157, 0.3);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        text-align: center;
-    }
-    
-    .extension-status.warning {
-        background: rgba(255, 193, 7, 0.1);
-        border-color: rgba(255, 193, 7, 0.3);
-    }
-    
-    .check-results-btn {
-        background: linear-gradient(45deg, #28a745, #20c997);
-        color: white;
-        border: none;
-        padding: 0.8rem 1.5rem;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-left: 1rem;
-    }
-    
-    .check-results-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-    }
-
 </style>
-
-<!-- Extension Status Section -->
-<div id="extensionStatus" class="extension-status" style="display: none;">
-    <p id="extensionMessage"></p>
-</div>
 
 <!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -531,9 +523,9 @@
     <div class="info-box">
         <h3>🚀 How it works</h3>
         <ul>
-            <li>Select a job site to search from or choose "All Platforms" to use JobSpy</li>
+            <li>Select job sites to search from (Indeed, LinkedIn, Glassdoor, Google Jobs, Bayt)</li>
             <li>Enter your search terms and location preferences</li>
-            <li>Set the number of results you want</li>
+            <li>Set the number of results and maximum job age</li>
             <li>Download results as a CSV file for further analysis</li>
         </ul>
     </div> -->
@@ -589,12 +581,6 @@
 
             <div class="form-group">
                 {{ form.submit(class="submit-btn", id="submitBtn") }}
-                <button type="button" class="check-results-btn" id="checkResultsBtn" onclick="checkForScrapedJobs()">
-                    Check for Extension Results
-                </button>
-                <button type="button" class="check-results-btn" id="testDataBtn" onclick="testExtensionData()" style="background: linear-gradient(45deg, #ff6b35, #f7931e); margin-left: 0.5rem;">
-                    Test with Sample Data
-                </button>
             </div>
         </form>
     </div>
@@ -619,6 +605,7 @@
                         "<span>{{ search_info.search_term }}</span>" in 
                         "<span>{{ search_info.location }}</span>" from 
                         <span>{{ search_info.sites|join(', ') }}</span>
+                        (last {{ search_info.hours_old }} hours)
                     </div>
                 {% endif %}
             </div>
@@ -705,155 +692,6 @@
 </div>
 
 <script>
-    // Function to check for scraped jobs from extension
-    function checkForScrapedJobs() {
-        console.log('=== CyberCrack: Checking for scraped jobs ===');
-        
-        try {
-            // Check all localStorage keys for debugging
-            console.log('All localStorage keys:', Object.keys(localStorage));
-            
-            const scrapedData = localStorage.getItem('cybercrack_scraped_jobs');
-            console.log('Raw localStorage data:', scrapedData);
-            
-            if (scrapedData) {
-                const jobsData = JSON.parse(scrapedData);
-                console.log('Parsed jobs data:', jobsData);
-                console.log('Jobs array length:', jobsData.jobs ? jobsData.jobs.length : 'No jobs array');
-                console.log('Timestamp:', jobsData.timestamp);
-                
-                // Check if data is recent (within last 10 minutes)
-                const tenMinutesAgo = Date.now() - (10 * 60 * 1000);
-                const dataAge = Date.now() - (jobsData.timestamp || 0);
-                console.log('Data age in minutes:', Math.round(dataAge / 60000));
-                console.log('Is data recent?', jobsData.timestamp && jobsData.timestamp > tenMinutesAgo);
-                
-                if (jobsData.timestamp && jobsData.timestamp > tenMinutesAgo) {
-                    
-                    console.log('Found scraped jobs data:', jobsData);
-                    showExtensionStatus(`Found ${jobsData.jobs.length} jobs from extension. Loading...`, 'success');
-                    
-                    // Show loading while sending data
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    if (loadingOverlay) {
-                        loadingOverlay.style.display = 'flex';
-                        loadingOverlay.querySelector('.loading-text').textContent = 'Loading scraped jobs...';
-                        loadingOverlay.querySelector('.loading-subtext').textContent = 'Processing data from Chrome extension...';
-                    }
-                    
-                    console.log('Sending data to /jobs/retrieve endpoint...');
-                    
-                    // Send data to Flask backend
-                    fetch('/jobs/retrieve', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify(jobsData)
-                    })
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        console.log('Response headers:', response.headers);
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Response data:', data);
-                        if (data.success) {
-                            // Clear the localStorage data
-                            localStorage.removeItem('cybercrack_scraped_jobs');
-                            console.log('Redirecting to:', data.redirect_url);
-                            
-                            // Redirect to show results
-                            window.location.href = data.redirect_url;
-                        } else {
-                            throw new Error(data.error || 'Failed to retrieve jobs');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error sending jobs data:', error);
-                        if (loadingOverlay) {
-                            loadingOverlay.style.display = 'none';
-                        }
-                        showExtensionStatus('Error loading scraped jobs: ' + error.message, 'error');
-                    });
-                } else {
-                    // Data is too old, remove it
-                    console.log('Data is too old, removing...');
-                    localStorage.removeItem('cybercrack_scraped_jobs');
-                    showExtensionStatus('No recent extension data found. Try scraping again.', 'warning');
-                }
-            } else {
-                console.log('No localStorage data found');
-                showExtensionStatus('No extension data found. Make sure you\'ve used the Chrome extension to scrape jobs.', 'warning');
-            }
-        } catch (error) {
-            console.error('Error checking for scraped jobs:', error);
-            showExtensionStatus('Error checking for extension data.', 'error');
-        }
-    }
-
-    // Test function to simulate extension data
-    function testExtensionData() {
-        console.log('Creating test extension data...');
-        const testData = {
-            jobs: [
-                {
-                    title: 'Senior Software Engineer',
-                    company: 'Tech Corp',
-                    location: 'Singapore',
-                    job_url: 'https://linkedin.com/job/123',
-                    description: 'Great opportunity for a senior software engineer...',
-                    job_type: 'Full-time',
-                    date_posted: '2 days ago',
-                    site: 'LinkedIn'
-                },
-                {
-                    title: 'Cybersecurity Analyst',
-                    company: 'Security Inc',
-                    location: 'Remote',
-                    job_url: 'https://linkedin.com/job/456',
-                    description: 'Looking for a cybersecurity analyst with 3+ years experience...',
-                    job_type: 'Full-time',
-                    date_posted: '1 day ago',
-                    site: 'LinkedIn'
-                }
-            ],
-            searchTerm: 'cybersecurity',
-            location: 'Singapore',
-            timestamp: Date.now(),
-            status: 'completed'
-        };
-        
-        localStorage.setItem('cybercrack_scraped_jobs', JSON.stringify(testData));
-        console.log('Test data stored in localStorage');
-        
-        // Check for the data
-        setTimeout(() => {
-            checkForScrapedJobs();
-        }, 1000);
-    }
-    
-    function showExtensionStatus(message, type) {
-        const statusDiv = document.getElementById('extensionStatus');
-        const messageP = document.getElementById('extensionMessage');
-        
-        statusDiv.className = 'extension-status';
-        if (type === 'warning' || type === 'error') {
-            statusDiv.classList.add('warning');
-        }
-        
-        messageP.textContent = message;
-        statusDiv.style.display = 'block';
-        
-        // Auto-hide after 5 seconds for success messages
-        if (type === 'success') {
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
-        }
-    }
-
     // Auto-close flash messages after 5 seconds
     document.addEventListener('DOMContentLoaded', function() {
         const flashMessages = document.querySelectorAll('.flash-message');
@@ -978,12 +816,7 @@
     window.addEventListener('load', function() {
         loadingOverlay.style.display = 'none';
         submitBtn.disabled = false;
-        updateSubmitButton(); // Reset to appropriate button text
-    });
-
-    // Also check when window gains focus (when user returns from LinkedIn)
-    window.addEventListener('focus', function() {
-        setTimeout(checkForScrapedJobs, 500);
+        submitBtn.textContent = 'Scrape Jobs';
     });
 </script>
 {% endblock %}
