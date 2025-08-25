@@ -12,7 +12,7 @@ python-jobspy==1.1.82
 PyPDF2==3.0.1
 docx==0.2.4
 requests==2.31.0
-fitz==0.0.1
+fitz==0.0.1.dev2
 PyMuPDF==1.26.3
 psycopg2-binary==2.9.10
 Flask-Migrate==4.1.0
