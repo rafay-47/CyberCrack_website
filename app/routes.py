@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import secrets
 from app.services.jobspy_service import fetch_jobs_from_jobspy
-# Lazy import OptimizedJobAnalyzer inside get_job_analyzer to avoid heavy imports at module load
+from app.services.job_analyzer import OptimizedJobAnalyzer
 import logging
 from app.services.resume_parser import parse_resume, _read_text_from_file
 from app.services.ai_resume_parser import parse_text as ai_parse_text
@@ -52,29 +52,21 @@ def get_job_analyzer():
         if _JOB_ANALYZER is not None:
             return _JOB_ANALYZER
         try:
-            # Import analyzer class lazily to avoid loading heavy dependencies at import time
-            try:
-                from app.services.job_analyzer import OptimizedJobAnalyzer
-            except Exception as imp_err:
-                _logger.warning('Failed to import OptimizedJobAnalyzer lazily: %s', imp_err)
-                OptimizedJobAnalyzer = None
-
-            if OptimizedJobAnalyzer is None:
-                _JOB_ANALYZER = None
-            else:
-                _JOB_ANALYZER = OptimizedJobAnalyzer(
-                    spacy_model='en_core_web_sm',
-                    fast_mode=True,
-                    confidence_threshold=0.25,
-                    cache_size=256,
-                    enable_threading=True,
-                    max_workers=4
-                )
+            _JOB_ANALYZER = OptimizedJobAnalyzer(
+                spacy_model='en_core_web_sm',
+                fast_mode=True,
+                confidence_threshold=0.25,
+                cache_size=256,
+                enable_threading=True,
+                max_workers=4
+            )
             _logger.info('JobAnalyzer initialized lazily')
         except Exception as _init_err:
             _JOB_ANALYZER = None
             _logger.warning(f'JobAnalyzer failed to initialize lazily: {_init_err}', exc_info=True)
         return _JOB_ANALYZER
+    
+_JOB_ANALYZER = get_job_analyzer()
 
 def is_admin_email(email):
     """
@@ -463,7 +455,7 @@ def jobs():
             jobs_data = jobs.to_dict('records') if jobs is not None and not jobs.empty else []
             # Run job analyzer to extract skills for each job (if jobs present)
             if jobs_data:
-                analyzer = get_job_analyzer()
+                analyzer = _JOB_ANALYZER
                 if analyzer is not None:
                     try:
                         for i, job_rec in enumerate(jobs_data):
