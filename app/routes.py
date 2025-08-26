@@ -28,20 +28,43 @@ main_blueprint = Blueprint('main', __name__)
 # Logger for this module
 _logger = logging.getLogger(__name__)
 
-# Pre-initialize JobAnalyzer once when module is imported to avoid reloading spaCy/skillNer
-try:
-    _JOB_ANALYZER = OptimizedJobAnalyzer(
-                spacy_model='en_core_web_md',
+# Lazily initialize the heavy JobAnalyzer to avoid loading large NLP models at import time.
+# This prevents worker startup timeouts and high memory usage when handling light requests
+# (e.g., public pages, login/signup) that don't need the analyzer.
+_JOB_ANALYZER = None
+_JOB_ANALYZER_LOCK = None
+
+def get_job_analyzer():
+    """Thread-safe lazy initializer for OptimizedJobAnalyzer.
+
+    Returns the singleton analyzer instance or None if initialization failed.
+    """
+    global _JOB_ANALYZER, _JOB_ANALYZER_LOCK
+    if _JOB_ANALYZER is not None:
+        return _JOB_ANALYZER
+
+    # Lazy-create the lock only when needed (avoid importing threading at top-level unnecessarily)
+    if _JOB_ANALYZER_LOCK is None:
+        import threading
+        _JOB_ANALYZER_LOCK = threading.Lock()
+
+    with _JOB_ANALYZER_LOCK:
+        if _JOB_ANALYZER is not None:
+            return _JOB_ANALYZER
+        try:
+            _JOB_ANALYZER = OptimizedJobAnalyzer(
+                spacy_model='en_core_web_sm',
                 fast_mode=True,
                 confidence_threshold=0.25,
                 cache_size=256,
                 enable_threading=True,
                 max_workers=4
             )
-    _logger.info('JobAnalyzer pre-initialized at module import')
-except Exception as _init_err:
-    _JOB_ANALYZER = None
-    _logger.warning(f'JobAnalyzer failed to initialize at import: {_init_err}')
+            _logger.info('JobAnalyzer initialized lazily')
+        except Exception as _init_err:
+            _JOB_ANALYZER = None
+            _logger.warning(f'JobAnalyzer failed to initialize lazily: {_init_err}', exc_info=True)
+        return _JOB_ANALYZER
 
 def is_admin_email(email):
     """
@@ -429,34 +452,36 @@ def jobs():
 
             jobs_data = jobs.to_dict('records') if jobs is not None and not jobs.empty else []
             # Run job analyzer to extract skills for each job (if jobs present)
-            if jobs_data and _JOB_ANALYZER is not None:
-                try:
-                    for i, job_rec in enumerate(jobs_data):
-                        # Build text to analyze from available fields
-                        title = job_rec.get('title') or ''
-                        company = job_rec.get('company') or ''
-                        description = job_rec.get('description') or ''
-                        text_to_analyze = f"{title} {company} {description}".strip()
+            if jobs_data:
+                analyzer = get_job_analyzer()
+                if analyzer is not None:
+                    try:
+                        for i, job_rec in enumerate(jobs_data):
+                            # Build text to analyze from available fields
+                            title = job_rec.get('title') or ''
+                            company = job_rec.get('company') or ''
+                            description = job_rec.get('description') or ''
+                            text_to_analyze = f"{title} {company} {description}".strip()
 
-                        try:
-                            analysis = _JOB_ANALYZER.analyze_job_posting(text_to_analyze, job_id=job_rec.get('job_url') or f"job_{i}")
-                            # Attach a lightweight skills list for the template
-                            job_rec['extracted_skills'] = [
-                                {
-                                    'name': s.name,
-                                    'surface_form': s.surface_form,
-                                    'confidence': round(s.confidence, 2),
-                                    'type': s.skill_type,
-                                    'source': s.source
-                                } for s in (analysis.skills or [])
-                            ]
-                        except Exception as e:
-                            job_rec['extracted_skills'] = []
-                except Exception as e:
-                    # If analyzer fails during processing, continue without skills
-                    _logger.warning(f"JobAnalyzer processing failed: {e}")
-            elif jobs_data and _JOB_ANALYZER is None:
-                _logger.warning('JobAnalyzer is not available; skipping skills extraction for scraped jobs')
+                            try:
+                                analysis = analyzer.analyze_job_posting(text_to_analyze, job_id=job_rec.get('job_url') or f"job_{i}")
+                                # Attach a lightweight skills list for the template
+                                job_rec['extracted_skills'] = [
+                                    {
+                                        'name': s.name,
+                                        'surface_form': s.surface_form,
+                                        'confidence': round(s.confidence, 2),
+                                        'type': s.skill_type,
+                                        'source': s.source
+                                    } for s in (analysis.skills or [])
+                                ]
+                            except Exception:
+                                job_rec['extracted_skills'] = []
+                    except Exception as e:
+                        # If analyzer fails during processing, continue without skills
+                        _logger.warning(f"JobAnalyzer processing failed: {e}")
+                else:
+                    _logger.warning('JobAnalyzer is not available; skipping skills extraction for scraped jobs')
             search_info = {
                 'sites': sites,
                 'search_term': search_term,

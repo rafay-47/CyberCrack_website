@@ -65,7 +65,7 @@ class OptimizedJobAnalyzer:
     """High-performance, production-ready job posting analyzer"""
     
     def __init__(self, 
-                 spacy_model: str = 'en_core_web_md',
+                 spacy_model: str = 'en_core_web_sm',
                  confidence_threshold: float = 0.35,
                  max_skills_per_job: int = 50,
                  fast_mode: bool = False,
