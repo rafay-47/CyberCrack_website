@@ -677,11 +677,29 @@ def job_detail():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data.lower().strip()).first()
+        email = form.email.data.lower().strip()
+        current_app.logger.info('Login attempt for email=%s', email)
+        try:
+            user = User.query.filter_by(email=email).first()
+        except OperationalError as oe:
+            current_app.logger.error('OperationalError during login DB query', exc_info=oe)
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
+            try:
+                db.engine.dispose()
+            except Exception:
+                pass
+            flash('Database connection error. Please try again shortly.', 'error')
+            return render_template('login.html', form=form)
+
         if user and user.password_hash and check_password_hash(user.password_hash, form.password.data):
             login_user(user)
+            current_app.logger.info('User logged in: %s', email)
             flash('Logged in successfully', 'success')
             return redirect(url_for('main.jobs'))
+        current_app.logger.info('Failed login for email=%s', email)
         flash('Invalid credentials', 'error')
     return render_template('login.html', form=form)
 
@@ -690,16 +708,49 @@ def login():
 def signup():
     form = SignupForm()
     if form.validate_on_submit():
-        existing = User.query.filter((User.email==form.email.data.lower().strip()) | (User.username==form.username.data.strip())).first()
+        email = form.email.data.lower().strip()
+        username = form.username.data.strip()
+        current_app.logger.info('Signup attempt: username=%s email=%s', username, email)
+        try:
+            existing = User.query.filter((User.email==email) | (User.username==username)).first()
+        except OperationalError as oe:
+            current_app.logger.error('OperationalError during signup existence check', exc_info=oe)
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
+            try:
+                db.engine.dispose()
+            except Exception:
+                pass
+            flash('Database connection error. Please try again shortly.', 'error')
+            return render_template('signup.html', form=form)
+
         if existing:
+            current_app.logger.info('Signup blocked - existing user: %s or %s', username, email)
             flash('User with that email or username already exists', 'error')
             return render_template('signup.html', form=form)
-        user = User(username=form.username.data.strip(), email=form.email.data.lower().strip(), password_hash=generate_password_hash(form.password.data))
-        db.session.add(user)
-        db.session.commit()
-        login_user(user)
-        flash('Account created', 'success')
-        return redirect(url_for('main.jobs'))
+
+        user = User(username=username, email=email, password_hash=generate_password_hash(form.password.data))
+        try:
+            db.session.add(user)
+            db.session.commit()
+            login_user(user)
+            current_app.logger.info('Account created: %s', email)
+            flash('Account created', 'success')
+            return redirect(url_for('main.jobs'))
+        except OperationalError as oe:
+            current_app.logger.error('OperationalError during signup commit', exc_info=oe)
+            try:
+                db.session.rollback()
+            except Exception:
+                pass
+            try:
+                db.engine.dispose()
+            except Exception:
+                pass
+            flash('Database error creating account. Please try again later.', 'error')
+            return render_template('signup.html', form=form)
     return render_template('signup.html', form=form)
 
 
