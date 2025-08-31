@@ -142,6 +142,7 @@ def parse_text(text: str) -> Dict[str, Any]:
             # Create a detailed prompt for better results
             prompt = f"""Parse this resume text into a JSON object with the following structure:
 {{
+  "title": "professional title",
   "name": "full name",
   "email": "email address", 
   "phone": "phone number",

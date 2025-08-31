@@ -1,0 +1,545 @@
+{% extends "base.html" %}
+
+{% block title %}Job Search Results - CyberCrack{% endblock %}
+
+{% block content %}
+<style>
+.jobs-list-container { 
+    max-width: 1200px; 
+    margin: 2rem auto; 
+    padding: 0 1rem;
+}
+
+.results-header {
+    background: var(--secondary-bg);
+    border: 1px solid rgba(0,180,216,0.12);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.results-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+}
+
+.results-header h2 {
+    font-size: 2rem;
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.search-summary {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.search-summary span {
+    color: var(--neon-green);
+    font-weight: 600;
+}
+
+.jobs-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.job-card {
+    background: var(--secondary-bg);
+    border: 1px solid rgba(0,180,216,0.12);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.job-card:hover {
+    border-color: rgba(0,180,216,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 180, 216, 0.15);
+}
+
+.job-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.job-card:hover::before {
+    opacity: 1;
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.job-title-section {
+    flex: 1;
+    min-width: 300px;
+}
+
+.job-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--neon-blue);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s ease;
+}
+
+.job-title:hover {
+    color: var(--neon-green);
+    text-decoration: none;
+}
+
+.job-company {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.job-location {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.job-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.job-site-badge {
+    background: rgba(0, 180, 216, 0.15);
+    color: var(--neon-blue);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(0, 180, 216, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.job-meta-row {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.job-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.job-meta-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.job-meta-value {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.job-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.skills-section {
+    margin-bottom: 1.5rem;
+}
+
+.skills-section h4 {
+    color: var(--neon-blue);
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill-tag {
+    background: rgba(0, 180, 216, 0.12);
+    border: 1px solid rgba(0, 180, 216, 0.2);
+    color: var(--neon-green);
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+    background: rgba(0, 180, 216, 0.2);
+    transform: translateY(-1px);
+}
+
+.skills-placeholder {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px dashed rgba(0, 180, 216, 0.2);
+}
+
+.job-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 180, 216, 0.1);
+}
+
+.compare-btn {
+    background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.compare-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 255, 157, 0.3);
+}
+
+.external-link-btn {
+    background: rgba(0, 180, 216, 0.1);
+    color: var(--neon-blue);
+    border: 1px solid rgba(0, 180, 216, 0.3);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.external-link-btn:hover {
+    background: rgba(0, 180, 216, 0.2);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: var(--neon-blue);
+}
+
+.job-actions-info {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    flex: 1;
+    min-width: 200px;
+}
+
+.back-to-search {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 180, 216, 0.1);
+}
+
+.back-btn {
+    background: rgba(0, 180, 216, 0.1);
+    color: var(--neon-blue);
+    border: 1px solid rgba(0, 180, 216, 0.3);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: rgba(0, 180, 216, 0.2);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: var(--neon-blue);
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem;
+    background: var(--secondary-bg);
+    border: 1px solid rgba(0, 180, 216, 0.12);
+    border-radius: 12px;
+    margin-top: 2rem;
+}
+
+.no-results h3 {
+    color: var(--neon-blue);
+    margin-bottom: 1rem;
+}
+
+.no-results p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .jobs-list-container {
+        padding: 0 0.5rem;
+    }
+    
+    .job-card {
+        padding: 1.25rem;
+    }
+    
+    .job-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .job-actions {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .job-title {
+        font-size: 1.2rem;
+    }
+    
+    .job-meta-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .job-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .job-actions-info {
+        text-align: center;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .results-header {
+        padding: 1.5rem;
+    }
+    
+    .results-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .job-card {
+        padding: 1rem;
+    }
+    
+    .compare-btn, .external-link-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<div class="jobs-list-container">
+    <!-- Search Results Header -->
+    <div class="results-header">
+        <h2>Job Search Results</h2>
+        {% if search_info %}
+            <div class="search-summary">
+                Found <span>{{ search_info.results_count }}</span> jobs for 
+                "<span>{{ search_info.search_term }}</span>" in 
+                "<span>{{ search_info.location }}</span>" from 
+                <span>{{ search_info.sites|join(', ') }}</span>
+                {% if search_info.job_type %}• {{ search_info.job_type|title }}{% endif %}
+                {% if search_info.work_type %}• {{ search_info.work_type|title }}{% endif %}
+                {% if search_info.hours_old is defined %}• Last {{ search_info.hours_old }} hours{% endif %}
+            </div>
+        {% else %}
+            <div class="search-summary">Showing <span>{{ jobs_data|length }}</span> job results</div>
+        {% endif %}
+    </div>
+
+    <!-- Job Listings -->
+    {% if jobs_data %}
+        <div class="jobs-grid">
+            {% for job in jobs_data %}
+                <div class="job-card">
+                    <!-- Job Header -->
+                    <div class="job-header">
+                        <div class="job-title-section">
+                            {% if job.job_url %}
+                                <a href="{{ job.job_url }}" target="_blank" class="job-title">
+                                    {{ job.title or 'Job Title Not Available' }}
+                                </a>
+                            {% else %}
+                                <div class="job-title">{{ job.title or 'Job Title Not Available' }}</div>
+                            {% endif %}
+                            <div class="job-company">{{ job.company or 'Company Not Specified' }}</div>
+                            <div class="job-location">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9C19,5.13 15.87,2 12,2M12,11.5C10.62,11.5 9.5,10.38 9.5,9C9.5,7.62 10.62,6.5 12,6.5C13.38,6.5 14.5,7.62 14.5,9C14.5,10.38 13.38,11.5 12,11.5Z"/>
+                                </svg>
+                                {{ job.location or 'Location Not Specified' }}
+                            </div>
+                        </div>
+                        
+                        <div class="job-actions">
+                            <div class="job-site-badge">{{ job.site or 'Job Board' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Job Meta Information -->
+                    <div class="job-meta-row">
+                        {% if job.job_type %}
+                            <div class="job-meta-item">
+                                <div class="job-meta-label">Job Type</div>
+                                <div class="job-meta-value">{{ job.job_type|title }}</div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if job.salary_min or job.salary_max %}
+                            <div class="job-meta-item">
+                                <div class="job-meta-label">Salary</div>
+                                <div class="job-meta-value">
+                                    {% if job.salary_min and job.salary_max %}
+                                        ${{ job.salary_min }} - ${{ job.salary_max }}
+                                    {% elif job.salary_min %}
+                                        ${{ job.salary_min }}+
+                                    {% elif job.salary_max %}
+                                        Up to ${{ job.salary_max }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if job.date_posted %}
+                            <div class="job-meta-item">
+                                <div class="job-meta-label">Posted</div>
+                                <div class="job-meta-value">{{ job.date_posted }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Job Description -->
+                    {% if job.description is not none and ((job.description|string)|trim) %}
+                        <div class="job-description">
+                            {{ (job.description|string)|striptags|truncate(300) }}
+                        </div>
+                    {% endif %}
+
+
+
+                    <!-- Action Buttons -->
+                    <div class="job-actions-row">
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; width: 100%;">
+                            {% if job.job_url %}
+                                <a href="{{ job.job_url }}" target="_blank" class="external-link-btn">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                                    </svg>
+                                    View Job
+                                </a>
+                            {% endif %}
+                            
+                            <form method="POST" action="{{ url_for('main.job_detail') }}" style="display:inline; margin:0; padding:0;">
+                                <input type="hidden" name="job_json" value='{{ job|tojson }}'>
+                                <input type="hidden" name="profile_id" value="{{ session.get('selected_profile', '') }}">
+                                <button type="submit" class="compare-btn">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                                    </svg>
+                                    Analyze Match
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results">
+            <h3>No Jobs Found</h3>
+            <p>No jobs found matching your criteria. Try adjusting your search parameters or broadening your search terms.</p>
+        </div>
+    {% endif %}
+
+    <!-- Back to Search -->
+    <div class="back-to-search">
+        <a href="{{ url_for('main.jobs') }}" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+            </svg>
+            Back to Job Search
+        </a>
+    </div>
+</div>
+
+{% endblock %}

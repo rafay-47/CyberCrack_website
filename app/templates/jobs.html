@@ -16,89 +16,531 @@
     }
 
     .jobs-header h1 {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
+        font-family: 'Orbitron', sans-serif;
         background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(0, 180, 216, 0.5);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        position: relative;
+    }
+
+    .jobs-header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+        box-shadow: 0 0 10px rgba(0, 180, 216, 0.8);
     }
 
     .jobs-header p {
         font-size: 1.2rem;
         color: var(--text-secondary);
         margin-bottom: 0;
+        font-family: 'Rajdhani', sans-serif;
+        font-weight: 300;
     }
 
-    .form-container {
-        background-color: var(--secondary-bg);
+    /* Cyber Search Form Container */
+    .search-form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        position: relative;
+    }
+
+    /* Cyber Grid Background */
+    .search-form-container::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        right: -20px;
+        bottom: -20px;
+        background-image: 
+            linear-gradient(rgba(0,180,216,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,180,216,0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        z-index: -1;
+        border-radius: 20px;
+    }
+
+    /* Main Search Row */
+    .main-search-row {
+        display: flex;
+        align-items: center;
+        background: var(--secondary-bg);
         border: 1px solid rgba(0, 180, 216, 0.3);
         border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(0, 180, 216, 0.1);
+        overflow: hidden;
         backdrop-filter: blur(10px);
-        margin-bottom: 2rem;
-    }
-
-    .form-section {
-        margin-bottom: 2rem;
-        padding: 1.5rem;
-        border: 1px solid rgba(0, 180, 216, 0.2);
-        border-radius: 8px;
-        background-color: rgba(22, 27, 34, 0.5);
-    }
-
-    .form-section h3 {
-        color: var(--neon-blue);
+        position: relative;
         margin-bottom: 1rem;
-        font-size: 1.3rem;
-        border-bottom: 1px solid rgba(0, 180, 216, 0.3);
-        padding-bottom: 0.5rem;
     }
 
-    .form-section.mandatory {
-        border-color: rgba(0, 255, 157, 0.3);
+    .main-search-row::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, 
+            transparent 30%, 
+            rgba(0, 180, 216, 0.03) 50%, 
+            transparent 70%);
+        pointer-events: none;
     }
 
-    .form-section.mandatory h3 {
-        color: var(--neon-green);
-        border-bottom-color: rgba(0, 255, 157, 0.3);
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
     }
 
-    .form-section.mandatory h3::after {
-        content: " *";
-        color: #ff6b6b;
+    .search-icon {
+        position: absolute;
+        left: 1.25rem;
+        color: var(--neon-blue);
+        z-index: 2;
+        filter: drop-shadow(0 0 4px rgba(0, 180, 216, 0.5));
     }
 
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: var(--text-primary);
-        font-weight: 600;
-        font-size: 1rem;
-    }
-
-    .form-control {
+    .main-search-input {
         width: 100%;
-        padding: 0.8rem;
+        padding: 1.25rem 1.25rem 1.25rem 3.25rem;
+        border: none;
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-weight: 400;
+        font-family: 'Rajdhani', sans-serif;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .main-search-input::placeholder {
+        color: var(--text-secondary);
+        font-weight: 400;
+    }
+
+    .main-search-input:focus {
+        color: var(--neon-blue);
+        text-shadow: 0 0 8px rgba(0, 180, 216, 0.4);
+    }
+
+    .dropdown-arrow {
+        color: var(--neon-blue);
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .start-agent-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1.25rem 2rem;
+        background: linear-gradient(135deg, var(--neon-blue), var(--accent));
+        color: white;
+        border: none;
+        border-left: 1px solid rgba(0, 180, 216, 0.2);
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: 'Rajdhani', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 0 11px 11px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .start-agent-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.2), 
+            transparent);
+        transition: left 0.5s ease;
+    }
+
+    .start-agent-btn:hover::before {
+        left: 100%;
+    }
+
+    .start-agent-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+        transform: translateY(-2px);
+        box-shadow: 
+            0 8px 25px rgba(0, 180, 216, 0.4),
+            0 0 20px rgba(0, 255, 157, 0.3);
+    }
+
+    .start-agent-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .agent-icon {
+        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+    }
+
+    /* Cyber Filter Row */
+    .filter-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+        min-height: 50px;
+    }
+
+    .filter-dropdown-wrapper {
+        position: relative;
+        z-index: 10;
+    }
+
+    .filter-dropdown-wrapper.active {
+        z-index: 1000;
+    }
+
+    .filter-dropdown-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(22, 27, 34, 0.8);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        font-family: 'Rajdhani', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        box-shadow: 
+            0 2px 8px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(0, 180, 216, 0.1);
+        backdrop-filter: blur(5px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .filter-dropdown-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(0, 180, 216, 0.1), 
+            transparent);
+        transition: left 0.4s ease;
+    }
+
+    .filter-dropdown-btn:hover::before {
+        left: 100%;
+    }
+
+    .filter-dropdown-btn:hover {
+        border-color: var(--neon-blue);
+        color: var(--neon-blue);
+        box-shadow: 
+            0 4px 15px rgba(0, 180, 216, 0.2),
+            0 0 10px rgba(0, 180, 216, 0.3);
+        transform: translateY(-1px);
+    }
+
+    .filter-dropdown-btn.active {
+        border-color: var(--neon-green);
+        color: var(--neon-green);
+        box-shadow: 
+            0 0 15px rgba(0, 255, 157, 0.4),
+            inset 0 0 10px rgba(0, 255, 157, 0.1);
+        text-shadow: 0 0 8px rgba(0, 255, 157, 0.6);
+    }
+
+    .required-asterisk {
+        color: var(--neon-green);
+        margin-left: 0.25rem;
+        filter: drop-shadow(0 0 4px rgba(0, 255, 157, 0.8));
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+
+    /* Cyber Dropdown Menus */
+    .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        left: 0;
+        min-width: 200px;
+        background: var(--secondary-bg);
+        border: 1px solid rgba(0, 180, 216, 0.4);
+        border-radius: 8px;
+        box-shadow: 
+            0 10px 30px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(0, 180, 216, 0.2),
+            inset 0 1px 0 rgba(0, 180, 216, 0.1);
+        z-index: 1000;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        animation: cyberDropdownSlide 0.3s ease-out;
+        position: relative;
+    }
+
+    .dropdown-menu::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, 
+            rgba(0, 180, 216, 0.05) 0%, 
+            transparent 50%, 
+            rgba(0, 255, 157, 0.05) 100%);
+        pointer-events: none;
+    }
+
+    @keyframes cyberDropdownSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            box-shadow: 0 0 0 rgba(0, 180, 216, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(0, 180, 216, 0.2);
+        }
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        font-family: 'Rajdhani', sans-serif;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        position: relative;
+        border-bottom: 1px solid rgba(0, 180, 216, 0.1);
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--neon-blue);
+        transform: scaleY(0);
+        transition: transform 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(0, 180, 216, 0.1);
+        color: var(--neon-blue);
+        text-decoration: none;
+        text-shadow: 0 0 8px rgba(0, 180, 216, 0.6);
+        padding-left: 1.25rem;
+    }
+
+    .dropdown-item:hover::before {
+        transform: scaleY(1);
+    }
+
+    .dropdown-item input[type="radio"] {
+        margin: 0;
+        accent-color: var(--neon-blue);
+        filter: drop-shadow(0 0 4px rgba(0, 180, 216, 0.5));
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(0, 180, 216, 0.5), 
+            transparent);
+        margin: 0.5rem 0;
+        box-shadow: 0 0 4px rgba(0, 180, 216, 0.3);
+    }
+
+    .add-profile-item {
+        color: var(--neon-green);
+        font-weight: 600;
+    }
+
+    .add-profile-item:hover {
+        background: rgba(0, 255, 157, 0.1);
+        color: var(--neon-green);
+        text-shadow: 0 0 8px rgba(0, 255, 157, 0.6);
+    }
+
+    .add-profile-item svg {
+        filter: drop-shadow(0 0 4px rgba(0, 255, 157, 0.5));
+    }
+
+    /* Cyber Location Dropdown */
+    .location-dropdown {
+        min-width: 300px;
+    }
+
+    .location-input-wrapper {
+        padding: 0.75rem;
+        border-bottom: 1px solid rgba(0, 180, 216, 0.2);
+        margin-bottom: 0.5rem;
+    }
+
+    .location-custom-input {
+        width: 100%;
+        padding: 0.75rem;
         border: 1px solid rgba(0, 180, 216, 0.3);
         border-radius: 6px;
-        background-color: rgba(22, 27, 34, 0.8);
+        background: rgba(0, 0, 0, 0.3);
         color: var(--text-primary);
-        font-size: 1rem;
+        font-size: 0.875rem;
+        font-family: 'Rajdhani', sans-serif;
+        outline: none;
         transition: all 0.3s ease;
-        box-sizing: border-box;
     }
 
-    .form-control:focus {
-        outline: none;
+    .location-custom-input:focus {
         border-color: var(--neon-blue);
-        box-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
-        background-color: rgba(22, 27, 34, 1);
+        box-shadow: 
+            0 0 10px rgba(0, 180, 216, 0.3),
+            inset 0 0 5px rgba(0, 180, 216, 0.1);
+        color: var(--neon-blue);
+        text-shadow: 0 0 8px rgba(0, 180, 216, 0.4);
+    }
+
+    .location-custom-input::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .popular-locations {
+        max-height: 200px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--neon-blue) transparent;
+    }
+
+    .popular-locations::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .popular-locations::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .popular-locations::-webkit-scrollbar-thumb {
+        background: var(--neon-blue);
+        border-radius: 2px;
+    }
+
+    .location-item {
+        padding: 0.75rem 1rem;
+        border-left: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .location-item:hover {
+        border-left-color: var(--neon-blue);
+    }
+
+    /* Cyber Additional Filters Dropdown */
+    .additional-filters-dropdown {
+        min-width: 320px;
+        padding: 1rem;
+    }
+
+    .filter-section {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border: 1px solid rgba(0, 180, 216, 0.2);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .filter-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .filter-label {
+        display: block;
+        color: var(--neon-blue);
+        font-size: 0.875rem;
+        font-weight: 600;
+        font-family: 'Orbitron', sans-serif;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 8px rgba(0, 180, 216, 0.4);
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.4);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        font-family: 'Rajdhani', sans-serif;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .filter-select:focus {
+        border-color: var(--neon-green);
+        box-shadow: 
+            0 0 10px rgba(0, 255, 157, 0.3),
+            inset 0 0 5px rgba(0, 255, 157, 0.1);
+        color: var(--neon-green);
+    }
+
+    .filter-select option {
+        background: var(--secondary-bg);
+        color: var(--text-primary);
+        padding: 0.5rem;
     }
 
     .checkbox-group {
@@ -477,25 +919,98 @@
         }
     }
 
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .search-input-group {
+            flex-wrap: wrap;
+            gap: 1px;
+        }
+
+        .search-field {
+            flex: 100%;
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .target-jobs-field,
+        .location-field,
+        .additional-filters-field {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-btn {
+            flex: 1;
+            border-radius: 0 0 11px 11px;
+            min-width: 100%;
+        }
+    }
+
     @media (max-width: 768px) {
         .jobs-container {
             padding: 1rem;
         }
 
-        .form-container {
-            padding: 1.5rem;
+        .search-form-container {
+            padding: 0 0.5rem;
         }
 
-        .form-row, .form-row-3 {
+        .main-search-bar {
+            padding: 0.75rem;
+        }
+
+        .search-input-group {
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .search-field,
+        .target-jobs-field,
+        .location-field,
+        .additional-filters-field,
+        .search-btn {
+            width: 100%;
+            border-right: none;
+            border-radius: 0;
+        }
+
+        .search-field {
+            border-radius: 11px 11px 0 0;
+        }
+
+        .search-btn {
+            border-radius: 0 0 11px 11px;
+        }
+
+        .filters-grid {
             grid-template-columns: 1fr;
         }
 
-        .checkbox-group {
-            grid-template-columns: 1fr;
+        .profile-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .profile-toggle-btn {
+            position: static;
+            margin-bottom: 1rem;
+            align-self: flex-start;
         }
 
         .jobs-header h1 {
             font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .search-input {
+            font-size: 16px; /* Prevent zoom on iOS */
+        }
+
+        .target-jobs-select,
+        .location-select {
+            font-size: 16px; /* Prevent zoom on iOS */
         }
     }
 
@@ -516,8 +1031,8 @@
 
 <div class="jobs-container">
     <div class="jobs-header">
-        <h1>Job Scraper</h1>
-        <p>Search and scrape job listings from multiple platforms</p>
+        <h1>CyberCrack Jobs</h1>
+        <p>Deploy AI-powered job hunting across the digital frontier</p>
     </div>
 <!-- 
     <div class="info-box">
@@ -530,57 +1045,166 @@
         </ul>
     </div> -->
 
-    <div class="form-container">
+        <!-- Modern Job Search Form -->
+    <div class="search-form-container">
         <form method="POST" action="{{ url_for('main.jobs') }}" id="jobScrapingForm">
             {{ form.hidden_tag() }}
             
-            <div class="form-group" style="display: flex; align-items: center; gap: 1rem;">
-                <div style="flex: 1;">
-                    <label class="form-label" for="profile_select">Profile</label>
-                    <select class="form-control" id="profile_select" name="profile">
+            <!-- Main Search Bar Row -->
+            <div class="main-search-row">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{ form.search_term(class="main-search-input", placeholder="For Software Engineer") }}
+                </div>
+
+                <button type="submit" class="start-agent-btn" id="submitBtn">
+                    <span class="btn-text">Get Jobs</span>
+                </button>
+            </div>
+
+            <!-- Filter Row -->
+            <div class="filter-row">
+                <div class="filter-dropdown-wrapper">
+                    <button type="button" class="filter-dropdown-btn" id="targetsBtn">
+                        <span>Target 10 jobs</span>
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu" id="targetsDropdown" style="display: none;">
+                        <label class="dropdown-item">
+                            <input type="radio" name="results_wanted" value="10" checked>
+                            <span>Target 10 jobs</span>
+                        </label>
+                        <label class="dropdown-item">
+                            <input type="radio" name="results_wanted" value="50">
+                            <span>Target 50 jobs</span>
+                        </label>
+                        <label class="dropdown-item">
+                            <input type="radio" name="results_wanted" value="100">
+                            <span>Target 100 jobs</span>
+                        </label>
+                        <label class="dropdown-item">
+                            <input type="radio" name="results_wanted" value="200">
+                            <span>Target 200 jobs</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-dropdown-wrapper">
+                    <button type="button" class="filter-dropdown-btn" id="platformsBtn">
+                        <span>All Platforms</span>
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu" id="platformsDropdown" style="display: none;">
+                        <label class="dropdown-item">
+                            <input type="radio" name="job_site" value="all" checked>
+                            <span>All Platforms</span>
+                        </label>
+                        <label class="dropdown-item">
+                            <input type="radio" name="job_site" value="indeed">
+                            <span>Indeed</span>
+                        </label>
+                        <label class="dropdown-item">
+                            <input type="radio" name="job_site" value="linkedin">
+                            <span>LinkedIn</span>
+                        </label>
+                        <label class="dropdown-item">
+                            <input type="radio" name="job_site" value="glassdoor">
+                            <span>Glassdoor</span>
+                        </label>
+                        <label class="dropdown-item">
+                            <input type="radio" name="job_site" value="google">
+                            <span>Google Jobs</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-dropdown-wrapper">
+                    <button type="button" class="filter-dropdown-btn" id="profileBtn">
+                        <span>Select Profile</span>
+                        <span class="required-asterisk">*</span>
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu" id="profileDropdown" style="display: none;">
                         {% if profiles %}
                             {% for p in profiles %}
-                                {# Attach a JSON blob to each option to avoid serializing entire model list in JS #}
-                                <option value="{{ p.id }}" data-profile='{{ {"name": p.name, "headline": p.headline, "location": p.location, "skills": p.skills, "extracted_keywords": p.extracted_keywords}|tojson }}'>{{ p.resume_filename }}</option>
+                                <label class="dropdown-item">
+                                    <input type="radio" name="profile" value="{{ p.id }}" data-profile='{{ {"name": p.name, "headline": p.headline, "location": p.location, "skills": p.skills, "extracted_keywords": p.extracted_keywords}|tojson }}'>
+                                    <span>{{ p.title }}</span>
+                                </label>
                             {% endfor %}
                         {% endif %}
-                    </select>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('main.add_profile') }}" class="dropdown-item add-profile-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Add New Profile</span>
+                        </a>
+                    </div>
                 </div>
-                <a href="{{ url_for('main.add_profile') }}" class="submit-btn" 
-                   style="width: auto; padding: 0.6rem 1.2rem; margin-top: 1.7rem; display: inline-block; text-align: center;">
-                    Add Profile
-                </a>
 
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="job_site_select">Job Site</label>
-                <select class="form-control" id="job_site_select" name="job_site">
-                    <option value="all">All Platforms</option>
-                    <option value="indeed">Indeed</option>
-                    <option value="linkedin">LinkedIn</option>
-                    <option value="glassdoor">Glassdoor</option>
-                    <option value="google">Google Jobs</option>
-                </select>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    {{ form.search_term.label }}
-                    {{ form.search_term(class="form-control", placeholder="e.g., software engineer") }}
+                <div class="filter-dropdown-wrapper">
+                    <button type="button" class="filter-dropdown-btn" id="locationBtn">
+                        <span>Location</span>
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu location-dropdown" id="locationDropdown" style="display: none;">
+                        <div class="location-input-wrapper">
+                            {{ form.location(class="location-custom-input", placeholder="Enter location") }}
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="popular-locations">
+                            <div class="dropdown-item location-item" data-location="Singapore">Singapore</div>
+                            <div class="dropdown-item location-item" data-location="New York">New York</div>
+                            <div class="dropdown-item location-item" data-location="San Francisco">San Francisco</div>
+                            <div class="dropdown-item location-item" data-location="London">London</div>
+                            <div class="dropdown-item location-item" data-location="Toronto">Toronto</div>
+                            <div class="dropdown-item location-item" data-location="Sydney">Sydney</div>
+                            <div class="dropdown-item location-item" data-location="Berlin">Berlin</div>
+                            <div class="dropdown-item location-item" data-location="Tokyo">Tokyo</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ form.location.label }}
-                    {{ form.location(class="form-control", placeholder="e.g., Singapore") }}
+
+                <div class="filter-dropdown-wrapper">
+                    <button type="button" class="filter-dropdown-btn" id="filtersBtn">
+                        <span>Additional Filters</span>
+                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu additional-filters-dropdown" id="filtersDropdown" style="display: none;">
+                        <div class="filter-section">
+                            <label class="filter-label">Job Type</label>
+                            <select class="filter-select" name="job_type">
+                                <option value="">Any</option>
+                                <option value="fulltime">Full-time</option>
+                                <option value="parttime">Part-time</option>
+                                <option value="internship">Internship</option>
+                                <option value="contract">Contract</option>
+                            </select>
+                        </div>
+                        <div class="filter-section">
+                            <label class="filter-label">Work Type</label>
+                            <select class="filter-select" name="work_type">
+                                <option value="">Any</option>
+                                <option value="remote">Remote</option>
+                                <option value="onsite">On-site</option>
+                                <option value="hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="form-group">
-                {{ form.results_wanted.label }}
-                {{ form.results_wanted(class="form-control", min="1", max="1000") }}
-            </div>
-
-            <div class="form-group">
-                {{ form.submit(class="submit-btn", id="submitBtn") }}
             </div>
         </form>
     </div>
@@ -593,102 +1217,7 @@
             <div class="loading-subtext">This may take a few moments</div>
         </div>
     </div>
-
-    <!-- Results Section -->
-    {% if jobs_data is not none %}
-        <div class="results-container">
-            <div class="results-header">
-                <h2>Search Results</h2>
-                {% if search_info %}
-                    <div class="search-summary">
-                        Found <span>{{ search_info.results_count }}</span> jobs for 
-                        "<span>{{ search_info.search_term }}</span>" in 
-                        "<span>{{ search_info.location }}</span>" from 
-                        <span>{{ search_info.sites|join(', ') }}</span>
-                        (last {{ search_info.hours_old }} hours)
-                    </div>
-                {% endif %}
-            </div>
-
-            {% if jobs_data %}
-                <div class="jobs-grid">
-                    {% for job in jobs_data %}
-                        <div class="job-card">
-                            <div class="job-site">{{ job.site }}</div>
-                            {% if job.job_url %}
-                                <a href="{{ job.job_url }}" target="_blank" class="job-title">
-                                    {{ job.title or 'N/A' }}
-                                </a>
-                            {% else %}
-                                <div class="job-title">{{ job.title or 'N/A' }}</div>
-                            {% endif %}
-                            
-                            <div class="job-company">{{ job.company or 'N/A' }}</div>
-                            <div class="job-location">📍 {{ job.location or 'N/A' }}</div>
-                            
-                            <div class="job-details">
-                                {% if job.salary_min or job.salary_max %}
-                                    <div class="job-detail">
-                                        <strong>Salary:</strong> 
-                                        {% if job.salary_min and job.salary_max %}
-                                            ${{ job.salary_min }} - ${{ job.salary_max }}
-                                        {% elif job.salary_min %}
-                                            ${{ job.salary_min }}+
-                                        {% elif job.salary_max %}
-                                            Up to ${{ job.salary_max }}
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                                
-                                {% if job.job_type %}
-                                    <div class="job-detail">
-                                        <strong>Type:</strong> {{ job.job_type }}
-                                    </div>
-                                {% endif %}
-                                
-                                {% if job.date_posted %}
-                                    <div class="job-detail">
-                                        <strong>Posted:</strong> {{ job.date_posted }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            {% if job.description %}
-                                <div class="job-description">
-                                    {{ job.description }}
-                                </div>
-                            {% endif %}
-                            {% if job.extracted_skills %}
-                                <div style="margin-top:0.8rem;">
-                                    <strong>Skills:</strong>
-                                    <div style="margin-top:0.4rem; display:flex; gap:0.4rem; flex-wrap:wrap;">
-                                        {% for s in job.extracted_skills[:8] %}
-                                            <span style="background:rgba(0,180,216,0.12); border:1px solid rgba(0,180,216,0.18); color:var(--neon-green); padding:0.25rem 0.5rem; border-radius:6px; font-size:0.8rem;">{{ s.name }}</span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            <!-- Compare button: posts job JSON and selected profile id to /job_detail -->
-                            <div style="margin-top:0.8rem; display:flex; gap:0.5rem; align-items:center;">
-                                <form method="POST" action="{{ url_for('main.job_detail') }}" style="display:inline; margin:0; padding:0;">
-                                    {{ form.hidden_tag() }}
-                                    <input type="hidden" name="job_json" value='{{ job|tojson }}'>
-                                    <input type="hidden" name="profile_id" id="compare_profile_{{ loop.index0 }}">
-                                    <button type="submit" class="submit-btn" style="padding:0.4rem 0.8rem; font-size:0.9rem;">Compare with Profile</button>
-                                </form>
-                                <div style="font-size:0.85rem; color:var(--text-secondary);">Select profile to compare using the selector at top of the page.</div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="no-results">
-                    <p>No jobs found matching your criteria. Try adjusting your search parameters.</p>
-                </div>
-            {% endif %}
-        </div>
-    {% endif %}
+</div>
 </div>
 
 <script>
@@ -769,27 +1298,164 @@
 
     // Handle form submission with loading state
     const form = document.getElementById('jobScrapingForm');
-    const submitBtn = document.getElementById('submitBtn');
+    const submitBtn = document.getElementById('submitBtn') || (function(){
+        // create a fallback submit button if template omitted it
+        const b = document.createElement('button');
+        b.id = 'submitBtn';
+        b.type = 'submit';
+        b.className = 'submit-btn';
+        b.textContent = 'Scrape Jobs';
+        form.appendChild(b);
+        return b;
+    })();
     const loadingOverlay = document.getElementById('loadingOverlay');
 
-    // Wire up profile select to auto-fill fields
-    const profileSelect = document.getElementById('profile_select');
-    if (profileSelect) {
-        profileSelect.addEventListener('change', function(e) {
-            fillFieldsFromProfile(e.target.value);
+    // Custom dropdown functionality
+    function setupDropdown(btnId, dropdownId, updateCallback) {
+        const btn = document.getElementById(btnId);
+        const dropdown = document.getElementById(dropdownId);
+        
+        if (!btn || !dropdown) return;
+
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Close other dropdowns and remove active classes
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu !== dropdown) {
+                    menu.style.display = 'none';
+                }
+            });
+            document.querySelectorAll('.filter-dropdown-btn').forEach(button => {
+                if (button !== btn) {
+                    button.classList.remove('active');
+                    button.closest('.filter-dropdown-wrapper').classList.remove('active');
+                }
+            });
+            
+            // Toggle current dropdown
+            const isVisible = dropdown.style.display !== 'none';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+            btn.classList.toggle('active', !isVisible);
+            btn.closest('.filter-dropdown-wrapper').classList.toggle('active', !isVisible);
+            
+            // Rotate arrow
+            const arrow = btn.querySelector('.dropdown-arrow');
+            if (arrow) {
+                arrow.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
         });
-        // Populate initial values if an option is selected by default
-        if (profileSelect.value) {
-            fillFieldsFromProfile(profileSelect.value);
-        }
+
+        // Handle dropdown item clicks
+        dropdown.addEventListener('click', function(e) {
+            const item = e.target.closest('.dropdown-item');
+            if (item && updateCallback) {
+                updateCallback(item, btn, dropdown);
+            }
+        });
     }
+
+    // Setup all dropdowns
+    setupDropdown('targetsBtn', 'targetsDropdown', function(item, btn, dropdown) {
+        const radio = item.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.checked = true;
+            btn.querySelector('span').textContent = item.querySelector('span').textContent;
+            dropdown.style.display = 'none';
+            btn.classList.remove('active');
+            btn.closest('.filter-dropdown-wrapper').classList.remove('active');
+            btn.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+        }
+    });
+
+    setupDropdown('platformsBtn', 'platformsDropdown', function(item, btn, dropdown) {
+        const radio = item.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.checked = true;
+            btn.querySelector('span').textContent = item.querySelector('span').textContent;
+            dropdown.style.display = 'none';
+            btn.classList.remove('active');
+            btn.closest('.filter-dropdown-wrapper').classList.remove('active');
+            btn.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+        }
+    });
+
+    setupDropdown('profileBtn', 'profileDropdown', function(item, btn, dropdown) {
+        const radio = item.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.checked = true;
+            btn.querySelector('span').textContent = item.querySelector('span').textContent;
+            dropdown.style.display = 'none';
+            btn.classList.remove('active');
+            btn.closest('.filter-dropdown-wrapper').classList.remove('active');
+            btn.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+            
+            // Fill fields from profile data
+            fillFieldsFromProfile(radio.value);
+        }
+    });
+
+    setupDropdown('locationBtn', 'locationDropdown', function(item, btn, dropdown) {
+        if (item.classList.contains('location-item')) {
+            const location = item.getAttribute('data-location');
+            const locationInput = document.querySelector('[name="location"]');
+            if (locationInput) {
+                locationInput.value = location;
+                btn.querySelector('span').textContent = location;
+                dropdown.style.display = 'none';
+                btn.classList.remove('active');
+                btn.closest('.filter-dropdown-wrapper').classList.remove('active');
+                btn.querySelector('.dropdown-arrow').style.transform = 'rotate(0deg)';
+            }
+        }
+    });
+
+    setupDropdown('filtersBtn', 'filtersDropdown', null);
+
+    // Location input functionality
+    const locationInput = document.querySelector('.location-custom-input');
+    const locationBtn = document.getElementById('locationBtn');
+    
+    if (locationInput && locationBtn) {
+        locationInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                locationBtn.querySelector('span').textContent = this.value;
+            } else {
+                locationBtn.querySelector('span').textContent = 'Location';
+            }
+        });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.filter-dropdown-wrapper')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.style.display = 'none';
+            });
+            document.querySelectorAll('.filter-dropdown-btn').forEach(button => {
+                button.classList.remove('active');
+                button.closest('.filter-dropdown-wrapper').classList.remove('active');
+                const arrow = button.querySelector('.dropdown-arrow');
+                if (arrow) {
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    });
 
     form.addEventListener('submit', function(e) {
         // Show loading overlay
         loadingOverlay.style.display = 'flex';
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Scraping...';
+        const searchBtnText = submitBtn.querySelector('.btn-text');
+        if (searchBtnText) {
+            searchBtnText.textContent = 'Searching...';
+        }
     });
+
+    // No client-side redirect here. The extension endpoint returns a JSON with a redirect_url
+    // and the extension or server-side logic should navigate to it. Server-side scraping also
+    // redirects to the jobs list when appropriate.
 
     // Populate compare forms' hidden profile_id with currently selected profile
     function populateCompareProfileInputs() {
@@ -816,7 +1482,11 @@
     window.addEventListener('load', function() {
         loadingOverlay.style.display = 'none';
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Scrape Jobs';
+        const searchBtnText = submitBtn.querySelector('.btn-text');
+        if (searchBtnText) {
+            searchBtnText.textContent = 'Start Agent';
+        }
     });
 </script>
 {% endblock %}
+

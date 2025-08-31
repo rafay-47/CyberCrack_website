@@ -29,6 +29,7 @@ class Profile(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey('user.id', ondelete='SET NULL'), nullable=True)
     resume_filename = db.Column(db.String(300), nullable=True)  # path or filename in uploads
+    title = db.Column(db.String(200), nullable=True)
     name = db.Column(db.String(200), nullable=True)
     email = db.Column(db.String(200), nullable=True)
     phone = db.Column(db.String(80), nullable=True)

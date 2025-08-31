@@ -1,92 +1,887 @@
 {% extends "base.html" %}
 
-{% block title %}Job / Profile Comparison - CyberCrack{% endblock %}
+{% block title %}Job Analysis - CyberCrack{% endblock %}
 
 {% block content %}
 <style>
-.compare-container { max-width:1100px; margin:2rem auto; display:grid; grid-template-columns: 1fr 1fr; gap:1rem; }
-.card { background:var(--secondary-bg); border:1px solid rgba(0,180,216,0.12); padding:1rem; border-radius:8px; }
-.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
-.score-badge { background:linear-gradient(45deg,var(--neon-green),var(--neon-blue)); color:#001; padding:0.4rem 0.6rem; border-radius:6px; font-weight:700; }
-.list-inline { display:flex; gap:0.4rem; flex-wrap:wrap; }
-.token { background:rgba(0,180,216,0.08); padding:0.25rem 0.5rem; border-radius:6px; color:var(--neon-green); }
-.matched { background:linear-gradient(90deg, rgba(0,255,157,0.12), rgba(0,180,216,0.08)); border:1px solid rgba(0,255,157,0.18);} 
-.meta { font-size:0.9rem; color:var(--text-secondary); }
-@media (max-width:900px){ .compare-container{ grid-template-columns:1fr; } }
+.job-detail-container { 
+    max-width: 1000px; 
+    margin: 2rem auto; 
+    padding: 0 1rem;
+}
+
+.job-listing-card { 
+    background: var(--secondary-bg); 
+    border: 1px solid rgba(0,180,216,0.12); 
+    border-radius: 12px; 
+    padding: 2rem; 
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.job-listing-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.job-title-section {
+    flex: 1;
+    min-width: 300px;
+}
+
+.job-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--neon-blue);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.job-company {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.job-location {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.job-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+.apply-btn {
+    background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.apply-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 157, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.job-site-badge {
+    background: rgba(0, 180, 216, 0.15);
+    color: var(--neon-blue);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(0, 180, 216, 0.3);
+}
+
+.job-meta-row {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.job-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.job-meta-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.job-meta-value {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.job-description {
+    margin-bottom: 2rem;
+}
+
+.job-description h3 {
+    color: var(--neon-blue);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.job-description-content {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 8;
+    line-clamp: 8;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-description-content p {
+    margin-bottom: 1rem;
+}
+
+.job-description-content ul, .job-description-content ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.job-description-content li {
+    margin-bottom: 0.5rem;
+}
+
+/* Comparison Section Styles */
+.comparison-section {
+    background: var(--secondary-bg);
+    border: 1px solid rgba(0,180,216,0.12);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.comparison-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.comparison-title {
+    font-size: 1.5rem;
+    background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.match-score-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.comparison-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.comparison-stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 180, 216, 0.1);
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.skills-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.skills-section {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 180, 216, 0.1);
+}
+
+.skills-section h4 {
+    color: var(--neon-blue);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.skill-tag {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid;
+    transition: all 0.2s ease;
+}
+
+.skill-tag.matched {
+    background: linear-gradient(90deg, rgba(0,255,157,0.15), rgba(0,180,216,0.1));
+    border-color: rgba(0,255,157,0.4);
+    color: var(--neon-green);
+    position: relative;
+}
+
+.skill-tag.matched::before {
+    content: '✓ ';
+    font-weight: bold;
+}
+
+.skill-tag.unmatched {
+    background: rgba(0, 180, 216, 0.08);
+    border-color: rgba(0, 180, 216, 0.2);
+    color: var(--text-secondary);
+}
+
+.skill-tag:hover {
+    transform: translateY(-1px);
+}
+
+.matched-skills-highlight {
+    background: var(--secondary-bg);
+    border: 1px solid rgba(0, 255, 157, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.matched-skills-highlight h4 {
+    color: var(--neon-green);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-summary {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(0, 180, 216, 0.1);
+}
+
+.profile-summary h4 {
+    color: var(--neon-blue);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-info {
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.score-badge { 
+    background: linear-gradient(45deg, var(--neon-green), var(--neon-blue)); 
+    color: #001; 
+    padding: 0.6rem 1rem; 
+    border-radius: 8px; 
+    font-weight: 700; 
+    font-size: 1.1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.score-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(0,180,216,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+    border-radius: 2px;
+    transition: width 0.8s ease;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--secondary-bg);
+    border: 1px solid rgba(0,180,216,0.12);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: rgba(0,180,216,0.3);
+    transform: translateY(-2px);
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--neon-green);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.compatibility-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.compatibility-high { background: rgba(0,255,157,0.2); color: var(--neon-green); }
+.compatibility-medium { background: rgba(255,165,2,0.2); color: #ffa502; }
+.compatibility-low { background: rgba(255,71,87,0.2); color: #ff4757; }
+
+.card h3 {
+    color: var(--neon-blue);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-icon {
+    width: 20px;
+    height: 20px;
+    fill: var(--neon-blue);
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.card-section {
+    margin-bottom: 1.5rem;
+}
+
+.card-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--neon-green);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.section-content {
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.list-inline { 
+    display: flex; 
+    gap: 0.5rem; 
+    flex-wrap: wrap; 
+    margin-top: 0.5rem;
+}
+
+.token { 
+    background: rgba(0,180,216,0.08); 
+    padding: 0.4rem 0.7rem; 
+    border-radius: 20px; 
+    color: var(--neon-green); 
+    font-size: 0.85rem;
+    border: 1px solid rgba(0,180,216,0.12);
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.token:hover {
+    background: rgba(0,180,216,0.15);
+    transform: translateY(-1px);
+}
+
+.matched { 
+    background: linear-gradient(90deg, rgba(0,255,157,0.15), rgba(0,180,216,0.1)); 
+    border: 1px solid rgba(0,255,157,0.3);
+    color: var(--neon-green);
+    font-weight: 500;
+} 
+
+.matched::before {
+    content: '✓ ';
+    font-weight: bold;
+}
+
+.meta { 
+    font-size: 0.9rem; 
+    color: var(--text-secondary); 
+}
+
+.external-link {
+    color: var(--neon-blue);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.2s ease;
+}
+
+.external-link:hover {
+    color: var(--neon-green);
+}
+
+.matches-section {
+    background: var(--secondary-bg);
+    border: 1px solid rgba(0,180,216,0.12);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+}
+
+.matches-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.matches-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--neon-green);
+}
+
+.match-count {
+    background: rgba(0,255,157,0.15);
+    color: var(--neon-green);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .job-detail-container {
+        padding: 0 0.5rem;
+    }
+    
+    .job-listing-card {
+        padding: 1.5rem;
+    }
+    
+    .job-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .job-actions {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .job-title {
+        font-size: 1.5rem;
+    }
+    
+    .job-meta-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .comparison-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .skills-comparison {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .comparison-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .comparison-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .job-meta-row {
+        gap: 0.75rem;
+    }
+    
+    .apply-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
 </style>
 
-<div class="container" style="max-width:1100px; margin:2rem auto;">
-    <div class="header">
-        <h2>Job & Profile Comparison</h2>
-        <div class="score-badge">Score: {{ match.score }}%</div>
-    </div>
-
-    <div class="meta" style="margin-bottom:1rem;">
-        Matches: {{ match.match_count }} | Job skills: {{ match.job_skill_count }} | Profile skills: {{ match.profile_skill_count }}
-    </div>
-
-    <div class="compare-container">
-        <div class="card">
-            <h3>Job</h3>
-            <div style="margin-bottom:0.6rem;"><strong>{{ job.title or 'N/A' }}</strong> — <span class="meta">{{ job.company or '' }} • {{ job.location or '' }}</span></div>
-            {% if job.job_url %}
-                <div style="margin-bottom:0.8rem;"><a href="{{ job.job_url }}" target="_blank">Open original listing</a></div>
-            {% endif %}
-
-            <div style="margin-bottom:0.6rem;"><strong>Description</strong>
-                <div style="color:var(--text-secondary); margin-top:0.4rem; white-space:pre-wrap;">{{ job.description }}</div>
+<div class="job-detail-container">
+    <!-- Job Listing Display -->
+    <div class="job-listing-card">
+        <div class="job-header">
+            <div class="job-title-section">
+                <h1 class="job-title">{{ job.title or 'Job Title Not Available' }}</h1>
+                <div class="job-company">{{ job.company or 'Company Not Specified' }}</div>
+                <div class="job-location">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9C19,5.13 15.87,2 12,2M12,11.5C10.62,11.5 9.5,10.38 9.5,9C9.5,7.62 10.62,6.5 12,6.5C13.38,6.5 14.5,7.62 14.5,9C14.5,10.38 13.38,11.5 12,11.5Z"/>
+                    </svg>
+                    {{ job.location or 'Location Not Specified' }}
+                </div>
             </div>
+            
+            <div class="job-actions">
+                {% if job.job_url %}
+                    <a href="{{ job.job_url }}" target="_blank" class="apply-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                        </svg>
+                        View Original Job
+                    </a>
+                {% endif %}
+                <div class="job-site-badge">{{ job.site or 'Job Board' }}</div>
+            </div>
+        </div>
 
-            <div style="margin-top:0.6rem;"><strong>Extracted Skills</strong>
-                <div class="list-inline" style="margin-top:0.4rem;">
-                    {% for s in (job.extracted_skills or [])[:80] %}
-                        <span class="token">{{ s.name or s.surface_form or s }}</span>
+        <div class="job-meta-row">
+            {% if job.job_type %}
+                <div class="job-meta-item">
+                    <div class="job-meta-label">Job Type</div>
+                    <div class="job-meta-value">{{ job.job_type|title }}</div>
+                </div>
+            {% endif %}
+            
+            {% if job.salary_min or job.salary_max %}
+                <div class="job-meta-item">
+                    <div class="job-meta-label">Salary</div>
+                    <div class="job-meta-value">
+                        {% if job.salary_min and job.salary_max %}
+                            ${{ job.salary_min }} - ${{ job.salary_max }}
+                        {% elif job.salary_min %}
+                            ${{ job.salary_min }}+
+                        {% elif job.salary_max %}
+                            Up to ${{ job.salary_max }}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if job.date_posted %}
+                <div class="job-meta-item">
+                    <div class="job-meta-label">Posted</div>
+                    <div class="job-meta-value">{{ job.date_posted }}</div>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if job.description %}
+            <div class="job-description">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                    Job Description
+                </h3>
+                <div class="job-description-content">
+                    {{ job.description|safe }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Comparison Section -->
+    <div class="comparison-section">
+        <div class="comparison-header">
+            <h2 class="comparison-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                </svg>
+                Profile Match Analysis
+            </h2>
+            <div class="match-score-display">
+                <div class="score-badge">
+                    {{ match.score or 0 }}% Match
+                    <div class="progress-bar">
+                        <div class="progress-fill" data-width="{{ match.score or 0 }}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-stats">
+            <div class="comparison-stat">
+                <span class="stat-number">{{ match.match_count or 0 }}</span>
+                <div class="stat-label">Matching Skills</div>
+            </div>
+            <div class="comparison-stat">
+                <span class="stat-number">{{ match.job_skill_count or 0 }}</span>
+                <div class="stat-label">Job Requirements</div>
+            </div>
+            <div class="comparison-stat">
+                <span class="stat-number">{{ match.profile_skill_count or 0 }}</span>
+                <div class="stat-label">Your Skills</div>
+            </div>
+            <div class="comparison-stat">
+                {% set score = match.score or 0 %}
+                {% if score >= 70 %}
+                    <span class="stat-number" style="color: var(--neon-green);">High</span>
+                    <div class="stat-label">Compatibility</div>
+                {% elif score >= 40 %}
+                    <span class="stat-number" style="color: #ffa502;">Medium</span>
+                    <div class="stat-label">Compatibility</div>
+                {% else %}
+                    <span class="stat-number" style="color: #ff4757;">Low</span>
+                    <div class="stat-label">Compatibility</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if match.matched_skills %}
+            <div class="matched-skills-highlight">
+                <h4>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                    </svg>
+                    Your Matching Skills ({{ (match.matched_skills or [])|length }})
+                </h4>
+                <div class="skills-grid">
+                    {% for skill in match.matched_skills %}
+                        <span class="skill-tag matched">{{ skill }}</span>
                     {% endfor %}
                 </div>
             </div>
-        </div>
+        {% endif %}
 
-        <div class="card">
-            <h3>Profile</h3>
-            {% if profile %}
-                <div style="margin-bottom:0.6rem;"><strong>{{ profile.name or profile.resume_filename }}</strong> — <span class="meta">{{ profile.headline or '' }} • {{ profile.location or '' }}</span></div>
-                <div style="margin-bottom:0.6rem;"><strong>Summary</strong>
-                    <div style="color:var(--text-secondary); margin-top:0.4rem; white-space:pre-wrap;">{{ profile.summary or 'No summary available.' }}</div>
+        <div class="skills-comparison">
+            <div class="skills-section">
+                <h4>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 6h-2l-2-2H8L6 6H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 15l-3.5-3.5 1.41-1.41L10 12.17l6.59-6.59L18 7l-8 8z"/>
+                    </svg>
+                    Job Requirements
+                </h4>
+                <div class="skills-grid">
+                    {% for s in (job.extracted_skills or [])[:30] %}
+                        {% set skill_name = s.name or s.surface_form or s %}
+                        {% if skill_name in (match.matched_skills or []) %}
+                            <span class="skill-tag matched">{{ skill_name }}</span>
+                        {% else %}
+                            <span class="skill-tag unmatched">{{ skill_name }}</span>
+                        {% endif %}
+                    {% endfor %}
                 </div>
+            </div>
 
-                <div style="margin-top:0.6rem;"><strong>Skills / Extracted Keywords</strong>
-                    <div class="list-inline" style="margin-top:0.4rem;">
-                        {% for s in (profile.skills or [])[:80] %}
-                            <span class="token">{{ s }}</span>
+            <div class="skills-section">
+                <h4>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                    Your Skills
+                </h4>
+                {% if profile %}
+                    <div class="skills-grid">
+                        {% for skill in (profile.skills or [])[:30] %}
+                            {% if skill in (match.matched_skills or []) %}
+                                <span class="skill-tag matched">{{ skill }}</span>
+                            {% else %}
+                                <span class="skill-tag unmatched">{{ skill }}</span>
+                            {% endif %}
                         {% endfor %}
-                        {% for s in (profile.extracted_keywords or [])[:80] %}
-                            <span class="token">{{ s }}</span>
+                        {% for skill in (profile.extracted_keywords or [])[:30] %}
+                            {% if skill in (match.matched_skills or []) %}
+                                <span class="skill-tag matched">{{ skill }}</span>
+                            {% else %}
+                                <span class="skill-tag unmatched">{{ skill }}</span>
+                            {% endif %}
                         {% endfor %}
                     </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No profile selected for comparison.</p>
+                        <a href="{{ url_for('main.add_profile') }}" class="apply-btn" style="margin-top: 1rem;">Create Profile</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if profile %}
+            <div class="profile-summary">
+                <h4>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                    {{ profile.name or profile.resume_filename or 'Your Profile' }}
+                </h4>
+                <div class="profile-info">
+                    {% if profile.headline %}
+                        <p><strong>Title:</strong> {{ profile.headline }}</p>
+                    {% endif %}
+                    {% if profile.location %}
+                        <p><strong>Location:</strong> {{ profile.location }}</p>
+                    {% endif %}
+                    {% if profile.summary %}
+                        <p><strong>Summary:</strong> {{ profile.summary }}</p>
+                    {% endif %}
                 </div>
-            {% else %}
-                <div>No profile selected. You can add a profile first and try again.</div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 
-    <div style="margin-top:1rem;">
-        <strong>Matched Keywords</strong>
-        <div class="list-inline" style="margin-top:0.6rem;">
-            {% if match.matched_skills %}
-                {% for m in match.matched_skills %}
-                    <span class="token matched">{{ m }}</span>
-                {% endfor %}
-            {% else %}
-                <div class="meta">No matching keywords found.</div>
-            {% endif %}
-        </div>
-    </div>
-
-    <div style="margin-top:1.5rem; display:flex; gap:0.6rem;">
-        <a href="{{ url_for('main.jobs') }}" class="submit-btn" style="background:transparent; border:1px solid rgba(0,180,216,0.2); color:var(--neon-blue);">Back to results</a>
-        <a href="{{ url_for('main.add_profile') }}" class="submit-btn">Edit/Add Profile</a>
+    <!-- Back Button -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{{ url_for('main.jobs_list') }}" class="apply-btn" style="background: rgba(0, 180, 216, 0.2); color: var(--neon-blue);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+            </svg>
+            Back to Job Results
+        </a>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set progress bar width and add animation
+    const progressFill = document.querySelector('.progress-fill');
+    if (progressFill) {
+        const targetWidth = progressFill.getAttribute('data-width') || '0';
+        progressFill.style.width = '0%';
+        setTimeout(() => {
+            progressFill.style.width = targetWidth + '%';
+        }, 500);
+    }
+
+    // Add staggered animation to tokens
+    const tokens = document.querySelectorAll('.token');
+    tokens.forEach((token, index) => {
+        token.style.opacity = '0';
+        token.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            token.style.transition = 'all 0.3s ease';
+            token.style.opacity = '1';
+            token.style.transform = 'translateY(0)';
+        }, index * 20);
+    });
+
+    // Add interactive hover effects for matched tokens
+    document.querySelectorAll('.token.matched').forEach(token => {
+        token.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px) scale(1.05)';
+        });
+        
+        token.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+</script>
 
 {% endblock %}

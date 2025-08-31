@@ -129,6 +129,8 @@ def normalize(parsed_raw):
         out['name'] = safe_get_string(['name', 'full_name', 'fullName', 'full name'])
         out['email'] = safe_get_string(['email', 'email_address', 'emailAddress', 'email address'])
         out['phone'] = safe_get_string(['phone', 'telephone', 'phone_number', 'phoneNumber', 'phone number', 'mobile'])
+        # Keep title separate from headline for professional title field
+        out['title'] = safe_get_string(['title', 'professional_title', 'job_title', 'current_title', 'position'])
         out['headline'] = safe_get_string(['headline', 'title', 'current_title', 'currentTitle', 'job_title', 'position'])
         out['location'] = safe_get_string(['location', 'city', 'location_city', 'address', 'place'])
         out['summary'] = safe_get_string(['summary', 'professional_summary', 'professionalSummary', 'about', 'bio', 'profile'])

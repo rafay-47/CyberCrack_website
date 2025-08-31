@@ -13,6 +13,7 @@ import secrets
 from app.services.jobspy_service import fetch_jobs_from_jobspy
 from app.services.job_analyzer import OptimizedJobAnalyzer
 import logging
+from pathlib import Path as _Path
 from app.services.resume_parser import parse_resume, _read_text_from_file
 from app.services.ai_resume_parser import parse_text as ai_parse_text
 from app.services.normalize_parser import normalize
@@ -67,6 +68,51 @@ def get_job_analyzer():
         return _JOB_ANALYZER
     
 _JOB_ANALYZER = get_job_analyzer()
+
+
+# Helper utilities to persist large scraped job payloads to server-side cache files
+def _ensure_job_cache_dir():
+    cache_dir = _Path(current_app.instance_path) / 'job_cache'
+    try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        # best-effort: ignore if cannot create (app may be read-only)
+        pass
+    return cache_dir
+
+
+def _save_jobs_to_cache(jobs_data, search_info=None):
+    """Save jobs_data and search_info into a JSON file under instance/job_cache.
+
+    Returns the relative cache filename (not full path) used as a session key.
+    """
+    cache_dir = _ensure_job_cache_dir()
+    fname = f"jobs_{uuid.uuid4().hex}.json"
+    dest = cache_dir / fname
+    payload = {'jobs': jobs_data or [], 'search_info': search_info or {}}
+    try:
+        with dest.open('w', encoding='utf-8') as f:
+            json.dump(payload, f, ensure_ascii=False, indent=None, default=str)
+        return fname
+    except Exception as e:
+        current_app.logger.warning('Failed to write job cache file: %s', e, exc_info=True)
+        return None
+
+
+def _load_jobs_from_cache(fname):
+    cache_dir = _Path(current_app.instance_path) / 'job_cache'
+    if not fname:
+        return None, None
+    path = cache_dir / fname
+    if not path.exists():
+        return None, None
+    try:
+        with path.open('r', encoding='utf-8') as f:
+            payload = json.load(f)
+        return payload.get('jobs', []), payload.get('search_info')
+    except Exception as e:
+        current_app.logger.warning('Failed to read job cache file %s: %s', fname, e, exc_info=True)
+        return None, None
 
 def is_admin_email(email):
     """
@@ -388,19 +434,21 @@ def retrieve_jobs():
             }
             validated_jobs.append(validated_job)
         
-        # Store in session for display
-        session['scraped_jobs'] = validated_jobs
-        session['search_info'] = search_info
-        
-        print(f"Stored {len(validated_jobs)} jobs in session")
+        # Persist the validated jobs to a server-side cache file and store only the
+        # cache filename in the session to avoid large cookie sizes.
+        cache_fname = _save_jobs_to_cache(validated_jobs, search_info)
+        if cache_fname:
+            session['scraped_jobs_cache'] = cache_fname
+
+        print(f"Stored {len(validated_jobs)} jobs in server cache: {cache_fname}")
         print("Session keys:", list(session.keys()))
-        
+
         current_app.logger.info(f"Retrieved {len(validated_jobs)} jobs from extension")
-        
+
         response_data = {
             'success': True,
             'jobs_count': len(validated_jobs),
-            'redirect_url': url_for('main.jobs')
+            'redirect_url': url_for('main.jobs_list')
         }
         print(f"Returning response: {response_data}")
         
@@ -425,11 +473,13 @@ def jobs():
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            # Get job site from dropdown
+            # Get all filter parameters from the form
             job_site = request.form.get('job_site')
             search_term = form.search_term.data
             location = form.location.data
-            results_wanted = form.results_wanted.data
+            results_wanted = int(request.form.get('results_wanted', form.results_wanted.data))
+            job_type = request.form.get('job_type')  # From additional filters
+            work_type = request.form.get('work_type')  # From additional filters
 
             if not job_site:
                 flash('Please select a job site.', 'error')
@@ -438,62 +488,68 @@ def jobs():
             jobs = None
             sites = []
             if job_site == 'all':
-                # Use jobspy for all platforms via service
+                # Use jobspy for all platforms via service with filters
                 jobs = fetch_jobs_from_jobspy(
                     site_names=['indeed', 'linkedin', 'glassdoor'],
                     search_term=search_term,
                     location=location,
-                    results_wanted=results_wanted
+                    results_wanted=results_wanted,
+                    job_type=job_type,
+                    work_type=work_type
                 )
                 sites = ['Indeed', 'LinkedIn', 'Glassdoor']
             else:
-                # For now, do not scrape for individual platforms
-                jobs = None
-                sites = [job_site.capitalize()]
-                flash('Scraping for individual platforms is not implemented yet.', 'warning')
+                # For individual platforms, also apply filters
+                site_mapping = {
+                    'indeed': 'indeed',
+                    'linkedin': 'linkedin', 
+                    'glassdoor': 'glassdoor',
+                    'google': 'google'
+                }
+                if job_site in site_mapping:
+                    jobs = fetch_jobs_from_jobspy(
+                        site_names=[site_mapping[job_site]],
+                        search_term=search_term,
+                        location=location,
+                        results_wanted=results_wanted,
+                        job_type=job_type,
+                        work_type=work_type
+                    )
+                    sites = [job_site.capitalize()]
+                else:
+                    jobs = None
+                    sites = [job_site.capitalize()]
+                    flash(f'Unsupported job site: {job_site}', 'error')
 
             jobs_data = jobs.to_dict('records') if jobs is not None and not jobs.empty else []
-            # Run job analyzer to extract skills for each job (if jobs present)
-            if jobs_data:
-                analyzer = _JOB_ANALYZER
-                if analyzer is not None:
-                    try:
-                        for i, job_rec in enumerate(jobs_data):
-                            # Build text to analyze from available fields
-                            title = job_rec.get('title') or ''
-                            company = job_rec.get('company') or ''
-                            description = job_rec.get('description') or ''
-                            text_to_analyze = f"{title} {company} {description}".strip()
-
-                            try:
-                                analysis = analyzer.analyze_job_posting(text_to_analyze, job_id=job_rec.get('job_url') or f"job_{i}")
-                                # Attach a lightweight skills list for the template
-                                job_rec['extracted_skills'] = [
-                                    {
-                                        'name': s.name,
-                                        'surface_form': s.surface_form,
-                                        'confidence': round(s.confidence, 2),
-                                        'type': s.skill_type,
-                                        'source': s.source
-                                    } for s in (analysis.skills or [])
-                                ]
-                            except Exception:
-                                job_rec['extracted_skills'] = []
-                    except Exception as e:
-                        # If analyzer fails during processing, continue without skills
-                        _logger.warning(f"JobAnalyzer processing failed: {e}")
-                else:
-                    _logger.warning('JobAnalyzer is not available; skipping skills extraction for scraped jobs')
+            print(jobs_data)
+            # Persist the currently selected profile ID so the jobs list page can use it for comparisons
+            selected_profile = request.form.get('profile') or request.form.get('profile_id')
+            if selected_profile:
+                session['selected_profile'] = selected_profile
+            # Skip job analyzer during scraping for better performance
+            # Skills will be extracted during job comparison instead
             search_info = {
                 'sites': sites,
                 'search_term': search_term,
                 'location': location,
                 'results_count': len(jobs_data),
                 'results_wanted': results_wanted,
+                'job_type': job_type,
+                'work_type': work_type,
                 'hours_old': None
             }
             if jobs is not None:
                 flash(f'Successfully scraped {len(jobs_data)} jobs!', 'success')
+            # Persist scraped jobs and search info to a server-side cache file
+            # instead of placing the full payload into the cookie-backed session.
+            try:
+                cache_fname = _save_jobs_to_cache(jobs_data, search_info)
+                if cache_fname:
+                    session['scraped_jobs_cache'] = cache_fname
+                    current_app.logger.debug('Persisted scraped jobs into server cache: %s', cache_fname)
+            except Exception as _sess_err:
+                current_app.logger.warning('Failed to persist scraped jobs into server cache: %s', _sess_err)
         except Exception as e:
             print(f"Error scraping jobs: {str(e)}")
             flash(f'Error scraping jobs: {str(e)}', 'error')
@@ -527,7 +583,37 @@ def jobs():
     except Exception:
         current_app.logger.debug('Failed to build profiles debug summary', exc_info=True)
 
+    # If server-side scraping produced jobs_data, redirect users to the dedicated jobs list page
+    if jobs_data:
+        return redirect(url_for('main.jobs_list'))
+
     return render_template('jobs.html', form=form, jobs_data=jobs_data, search_info=search_info, profiles=profiles)
+
+
+@main_blueprint.route('/jobs/list', methods=['GET'])
+@login_required
+def jobs_list():
+    """Render a separate page showing scraped jobs stored in the session.
+
+    If no scraped jobs are available, redirect back to the scraping page.
+    """
+    # Prefer server-side cached payload to avoid large session cookies
+    cache_fname = session.get('scraped_jobs_cache')
+    jobs_data = None
+    search_info = None
+    if cache_fname:
+        jobs_data, search_info = _load_jobs_from_cache(cache_fname)
+
+    # Backwards compatibility: if older code stored payload directly in session
+    if not jobs_data:
+        jobs_data = session.get('scraped_jobs')
+        search_info = session.get('search_info')
+
+    if not jobs_data:
+        flash('No scraped jobs found. Please perform a job scrape first.', 'error')
+        return redirect(url_for('main.jobs'))
+
+    return render_template('jobs_list.html', jobs_data=jobs_data, search_info=search_info)
 
 
 @main_blueprint.route('/job_detail', methods=['GET', 'POST'])
@@ -602,9 +688,49 @@ def job_detail():
                 s.add(p.lower())
             return s
 
-        # Job skills from extracted_skills or empty
+        # Extract job skills using the analyzer during comparison
         job_skill_objs = job.get('extracted_skills') or []
         job_skill_set = make_string_set(job_skill_objs)
+        
+        # If no pre-extracted skills, run the analyzer now
+        if not job_skill_set:
+            analyzer = get_job_analyzer()  # Use the lazy-loaded analyzer
+            if analyzer is not None:
+                try:
+                    # Build text to analyze from job fields
+                    title = job.get('title') or ''
+                    company = job.get('company') or ''
+                    description = job.get('description') or ''
+                    text_to_analyze = f"{title} {company} {description}".strip()
+                    
+                    if text_to_analyze:
+                        current_app.logger.info(f"Running job analysis for comparison with job: {title}")
+                        analysis = analyzer.analyze_job_posting(
+                            text_to_analyze, 
+                            job_id=job.get('job_url') or f"comparison_job_{job.get('title', 'unknown')}"
+                        )
+                        
+                        # Extract skills for comparison
+                        if analysis.skills:
+                            job_skill_objs = [
+                                {
+                                    'name': s.name,
+                                    'surface_form': s.surface_form,
+                                    'confidence': round(s.confidence, 2),
+                                    'type': s.skill_type,
+                                    'source': s.source
+                                } for s in analysis.skills
+                            ]
+                            # Add extracted skills to job data for template display
+                            job['extracted_skills'] = job_skill_objs
+                            job_skill_set = make_string_set(job_skill_objs)
+                            current_app.logger.info(f"Extracted {len(job_skill_objs)} skills for job comparison")
+                        else:
+                            current_app.logger.info("No skills extracted by analyzer")
+                except Exception as e:
+                    current_app.logger.warning(f"Job analysis failed during comparison: {e}")
+            else:
+                current_app.logger.warning('JobAnalyzer not available for comparison')
 
         # Profile skills/keywords
         profile_skill_set = set()
@@ -624,7 +750,7 @@ def job_detail():
                     pass
                 # best-effort: leave profile_skill_set empty if retry fails
 
-        # Fallback: try to pull some tokens from job.description if no extracted skills
+        # Fallback: try to pull some tokens from job.description if still no skills
         if not job_skill_set:
             desc = job.get('description') or ''
             # simple tokenization: split by non-word, take most common words >3 letters
@@ -633,6 +759,7 @@ def job_detail():
             freq = collections.Counter(tokens)
             common = [w for w, _ in freq.most_common(20)]
             job_skill_set = set(common)
+            current_app.logger.info(f"Used fallback tokenization, extracted {len(common)} tokens")
 
         matched = sorted(list(job_skill_set & profile_skill_set))
 
@@ -789,6 +916,7 @@ def add_profile():
 
         # If a resume file was uploaded, attempt to reuse a cached parse or parse once and cache result
         extracted_keywords = None
+        parsed_data = None
         try:
             if saved_filename:
                 full_saved_path = Path(current_app.static_folder) / saved_filename
@@ -801,12 +929,13 @@ def add_profile():
                             parsed_cached = json.load(cj)
                         if parsed_cached and isinstance(parsed_cached, dict):
                             # parsed_cached is expected to already be normalized by the parse endpoint
+                            parsed_data = parsed_cached
                             extracted_keywords = parsed_cached.get('extracted_keywords')
                     except Exception:
                         extracted_keywords = None
 
                 # If no cache, perform a single parse here (AI first, then local fallback) and write cache
-                if not extracted_keywords and not cache_path.exists():
+                if not parsed_data and not cache_path.exists():
                     try:
                         # Read file text for AI parsing - ignore binary errors
                         with open(full_saved_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -832,6 +961,7 @@ def add_profile():
                                 current_app.logger.debug('Failed to write parse cache', exc_info=True)
 
                         if isinstance(parsed_norm, dict):
+                            parsed_data = parsed_norm
                             extracted_keywords = parsed_norm.get('extracted_keywords')
                     except Exception:
                         extracted_keywords = None
@@ -918,6 +1048,20 @@ def add_profile():
         links = request.form.getlist('link[]') or []
         links = [lnk.strip() for lnk in links if lnk and lnk.strip()]
 
+        # Extract title from parsed data if available and not manually provided
+        title = None
+        if parsed_data and isinstance(parsed_data, dict):
+            # Try to get title from parsed data (before it gets normalized to headline)
+            title = parsed_data.get('title') or parsed_data.get('headline')
+        
+        # Use manual form inputs if provided, otherwise use parsed data defaults
+        final_name = profile_name or (parsed_data.get('name') if parsed_data else None)
+        final_email = email or (parsed_data.get('email') if parsed_data else None)
+        final_phone = phone or (parsed_data.get('phone') if parsed_data else None)
+        final_headline = headline or (parsed_data.get('headline') if parsed_data else None)
+        final_location = location or (parsed_data.get('location') if parsed_data else None)
+        final_summary = summary or (parsed_data.get('summary') if parsed_data else None)
+
         # Persist to DB
         try:
             user_id = None
@@ -927,20 +1071,21 @@ def add_profile():
             profile = Profile(
                 user_id=user_id,
                 resume_filename=saved_filename,
-                name=profile_name,
-                email=email,
-                phone=phone,
-                headline=headline,
-                location=location,
-                summary=summary,
-                skills=skills or None,
-                work_experience=work_items or None,
-                education=edu_items or None,
-                projects=project_items or None,
-                certifications=certifications or None,
-                languages=languages or None,
-                links=links or None
-                ,extracted_keywords=extracted_keywords or None
+                title=title,
+                name=final_name,
+                email=final_email,
+                phone=final_phone,
+                headline=final_headline,
+                location=final_location,
+                summary=final_summary,
+                skills=skills or (parsed_data.get('skills') if parsed_data else None),
+                work_experience=work_items or (parsed_data.get('work_experience') if parsed_data else None),
+                education=edu_items or (parsed_data.get('education') if parsed_data else None),
+                projects=project_items or (parsed_data.get('projects') if parsed_data else None),
+                certifications=certifications or (parsed_data.get('certifications') if parsed_data else None),
+                languages=languages or (parsed_data.get('languages') if parsed_data else None),
+                links=links or (parsed_data.get('links') if parsed_data else None),
+                extracted_keywords=extracted_keywords or None
             )
             db.session.add(profile)
             db.session.commit()
