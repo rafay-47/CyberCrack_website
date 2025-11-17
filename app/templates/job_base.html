@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-60FMXRZ5RD"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-60FMXRZ5RD');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CyberCrack Jobs - AI Security Career Hub{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7x2e5z5l5e5f5e5f5e5f5e5f5e5f5e5f" crossorigin="anonymous">
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/payment.js') }}" defer></script>
+    <style>
+        :root {
+            --primary-bg: #0d1117;
+            --secondary-bg: #161b22;
+            --neon-blue: #00b4d8;
+            --neon-green: #00ff9d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #5900ff;
+            --job-highlight: #ff6b35;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 25px 25px, rgba(0, 180, 216, 0.15) 2px, transparent 0),
+                linear-gradient(to right, rgba(0, 180, 216, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 180, 216, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        header {
+            background-color: var(--secondary-bg);
+            border-bottom: 1px solid rgba(0, 180, 216, 0.3);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(0, 180, 216, 0.5);
+            text-decoration: none;
+        }
+        
+        .logo-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .jobs-badge {
+            background: linear-gradient(45deg, var(--job-highlight), #ff8a50);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 0.5rem;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+            animation: jobPulse 2s infinite;
+        }
+
+        @keyframes jobPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 53, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(255, 107, 53, 0.7); }
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-sections {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .job-nav {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            padding-left: 2rem;
+            border-left: 1px solid rgba(0, 180, 216, 0.3);
+        }
+        
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--neon-blue);
+        }
+
+        .job-nav a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .job-nav a:hover {
+            color: var(--job-highlight);
+        }
+
+        .job-nav a.active {
+            color: var(--job-highlight);
+            text-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, var(--neon-blue), transparent);
+            transition: width 0.3s;
+        }
+
+        .job-nav a::after {
+            background: linear-gradient(90deg, var(--job-highlight), transparent);
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        main {
+            min-height: calc(100vh - 150px);
+            padding: 2rem 5%;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 180, 216, 0.5);
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.8);
+        }
+
+        .btn-job {
+            background: linear-gradient(45deg, var(--job-highlight), #ff8a50);
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+        }
+
+        .btn-job:hover {
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+        }
+
+        /* Form submit buttons used across templates (e.g., .submit-btn) */
+        .submit-btn {
+            display: inline-block;
+            width: 100%;
+            max-width: 360px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+            color: white;
+            padding: 0.9rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 180, 216, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.45);
+        }
+        
+        footer {
+            background-color: var(--secondary-bg);
+            padding: 1.5rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(0, 180, 216, 0.3);
+        }
+
+        .footer-job-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-job-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-job-links a:hover {
+            color: var(--job-highlight);
+        }
+        
+        .cyber-section {
+            position: relative;
+            border: 1px solid rgba(0, 180, 216, 0.3);
+            background-color: rgba(22, 27, 34, 0.7);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cyber-section::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, var(--neon-blue), transparent);
+            z-index: -1;
+            border-radius: 10px;
+            opacity: 0.5;
+        }
+
+        .job-section {
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .job-section::before {
+            background: linear-gradient(45deg, transparent, var(--job-highlight), transparent);
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Job-specific breadcrumb navigation */
+        .job-breadcrumb {
+            background: rgba(22, 27, 34, 0.5);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .job-breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .job-breadcrumb a:hover {
+            color: var(--job-highlight);
+        }
+
+        .job-breadcrumb .current {
+            color: var(--job-highlight);
+            font-weight: 600;
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-secondary);
+            margin: 0 0.25rem;
+        }
+        
+        /* Job Flash Messages */
+        .job-flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .job-flash-message {
+            margin-bottom: 10px;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: jobSlideIn 0.3s ease-out;
+        }
+
+        .job-flash-success {
+            background: linear-gradient(135deg, var(--job-highlight), #ff8a50);
+            border-color: var(--job-highlight);
+        }
+
+        .job-flash-error {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            border-color: #ff6b6b;
+        }
+
+        .job-flash-warning {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+            border-color: #ffa726;
+        }
+
+        .job-flash-info {
+            background: linear-gradient(135deg, var(--neon-blue), var(--accent));
+            border-color: var(--neon-blue);
+        }
+
+        @keyframes jobSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .nav-sections {
+                flex-direction: column;
+                gap: 1rem;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--secondary-bg);
+                padding: 1rem 0;
+                transform: translateY(-150%);
+                transition: transform 0.3s;
+                opacity: 0;
+                border-top: 1px solid rgba(0, 180, 216, 0.3);
+            }
+
+            .main-nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .job-nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding-left: 0;
+                border-left: none;
+                border-top: 1px solid rgba(255, 107, 53, 0.3);
+                padding-top: 1rem;
+            }
+            
+            nav.open .nav-sections {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+
+            .job-flash-messages {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+
+            .footer-job-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .job-breadcrumb {
+                flex-wrap: wrap;
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .jobs-badge {
+                font-size: 0.65rem;
+                padding: 0.25rem 0.6rem;
+            }
+
+            main {
+                padding: 1rem 3%;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <h1><a class="logo" href="{{ url_for('main.index') }}">CyberCrack</a></h1>
+                <span class="logo-subtitle">AI Security Career Hub</span>
+                <div class="jobs-badge">Jobs</div>
+            </div>
+            
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-sections">
+                <!-- <ul class="main-nav">
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                    <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+                    <li><a href="{{ url_for('main.download') }}">Download</a></li>
+                    <li><a href="{{ url_for('main.purchase') }}">Purchase</a></li>
+                </ul> -->
+                
+                <ul class="job-nav">
+                    <li><a href="{{ url_for('main.jobs') }}" {% if request.endpoint == 'main.jobs' %}class="active"{% endif %}>
+                        <i class="fas fa-search"></i> Job Search
+                    </a></li>
+                    <li><a href="{{ url_for('main.jobs_list') }}" {% if request.endpoint == 'main.jobs_list' %}class="active"{% endif %}>
+                        <i class="fas fa-list"></i> Job Results
+                    </a></li>
+                    <li><a href="{{ url_for('main.improve_profile') }}" {% if request.endpoint == 'main.improve_profile' %}class="active"{% endif %}>
+                        <i class="fas fa-magic"></i> Improve Profile
+                    </a></li>
+                    <li><a href="{{ url_for('main.add_profile') }}" {% if request.endpoint == 'main.add_profile' %}class="active"{% endif %}>
+                        <i class="fas fa-user-plus"></i> Add Profile
+                    </a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Job-specific breadcrumb navigation -->
+    {% block breadcrumb %}
+    <div class="job-breadcrumb">
+        <a href="{{ url_for('main.index') }}">
+            <i class="fas fa-home"></i> Home
+        </a>
+        <span class="breadcrumb-separator">></span>
+        <a href="{{ url_for('main.jobs') }}">Jobs</a>
+        <span class="breadcrumb-separator">></span>
+        <span class="current">{% block breadcrumb_current %}Current Page{% endblock %}</span>
+    </div>
+    {% endblock %}
+
+    <!-- Job Flash Messages -->
+    {% if request.endpoint in ['main.jobs', 'main.jobs_list', 'main.job_detail', 'main.batch_results', 'main.add_profile'] %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="job-flash-messages">
+                    {% for category, message in messages %}
+                        <div class="job-flash-message job-flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <footer>
+        <div class="footer-job-links">
+            <a href="{{ url_for('main.jobs') }}">Job Search</a>
+            <a href="{{ url_for('main.jobs_list') }}">Recent Results</a>
+            <a href="{{ url_for('main.improve_profile') }}">Improve Profile</a>
+            <a href="{{ url_for('main.add_profile') }}">Create Profile</a>
+            <a href="{{ url_for('main.contact') }}">Get Help</a>
+        </div>
+        <p>&copy; 2025 CyberCrack Jobs. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Mobile navigation toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const nav = document.querySelector('nav');
+        
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', function() {
+                nav.classList.toggle('open');
+                const icon = this.querySelector('i');
+                if (nav.classList.contains('open')) {
+                    icon.className = 'fas fa-times';
+                } else {
+                    icon.className = 'fas fa-bars';
+                }
+            });
+        }
+
+        // Auto-close job flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const jobFlashMessages = document.querySelectorAll('.job-flash-message');
+            jobFlashMessages.forEach(function(message, index) {
+                setTimeout(function() {
+                    message.style.animation = 'jobSlideOut 0.3s ease-out';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 300);
+                }, 5000 + (index * 500)); // Stagger removal if multiple messages
+            });
+        });
+
+        // Add slide out animation for job flash messages
+        const jobStyle = document.createElement('style');
+        jobStyle.textContent = `
+            @keyframes jobSlideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(jobStyle);
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!nav.contains(e.target) && nav.classList.contains('open')) {
+                nav.classList.remove('open');
+                const icon = mobileToggle.querySelector('i');
+                icon.className = 'fas fa-bars';
+            }
+        });
+
+        // Highlight current page in job navigation
+        const currentPath = window.location.pathname;
+        const jobNavLinks = document.querySelectorAll('.job-nav a');
+        
+        jobNavLinks.forEach(function(link) {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

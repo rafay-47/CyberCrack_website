@@ -188,7 +188,6 @@ Return only valid JSON, no additional text or formatting."""
 
             # Handle async provider call safely
             result = provider(prompt)
-            print(result)
             
             if hasattr(result, '__await__'):
                 import asyncio
@@ -260,4 +259,3 @@ Return only valid JSON, no additional text or formatting."""
 
 if __name__ == '__main__':
     sample = 'John Doe\nSoftware Engineer\nSummary: Experienced software engineer...\nSkills: Python, Flask, SQL\nProjects:\n- Project A: built X\n- Project B: built Y\n'
-    print(json.dumps(parse_text(sample), indent=2))

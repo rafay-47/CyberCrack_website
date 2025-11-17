@@ -7,6 +7,7 @@ import uuid
 import os
 from sqlalchemy import text
 import logging
+from flask_cors import CORS
 
 # expose migrate instance at module level for flask CLI to import
 migrate = Migrate()
@@ -17,6 +18,13 @@ login_manager = LoginManager()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Add CORS support for Chrome extension and web clients
+    CORS(app, 
+         origins=["chrome-extension://*", "http://localhost:*", "https://localhost:*"],
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
     # Ensure logging is configured early so app.logger emits to stdout/stderr
     try:
@@ -85,8 +93,15 @@ def create_app(config_class=Config):
             return None
         return User.query.get(uid)
 
-    from app.routes import main_blueprint
+    from app.routes import main_blueprint, init_cleanup_scheduler
     app.register_blueprint(main_blueprint)
+
+    # Initialize cleanup scheduler for temporary files
+    try:
+        with app.app_context():
+            init_cleanup_scheduler()
+    except Exception as cleanup_init_error:
+        app.logger.warning(f'Failed to initialize cleanup scheduler: {cleanup_init_error}')
 
     # Note: table creation/migrations should be handled externally (Flask-Migrate / Alembic)
 

@@ -58,6 +58,5 @@ def fetch_jobs_from_jobspy(site_names, search_term, location, results_wanted, jo
         if key not in jobspy_params and value is not None:
             jobspy_params[key] = value
     
-    print(f"JobSpy parameters: {jobspy_params}")  # Debug logging
     
     return scrape_jobs(**jobspy_params)

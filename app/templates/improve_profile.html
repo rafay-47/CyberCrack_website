@@ -1,0 +1,533 @@
+{% extends "job_base.html" %}
+
+{% block title %}Improve Profile - CyberCrack Jobs{% endblock %}
+
+{% block breadcrumb_current %}Improve Profile{% endblock %}
+
+{% block content %}
+<style>
+    .improve-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .improve-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .improve-header h1 {
+        font-size: 2.5rem;
+        font-family: 'Orbitron', sans-serif;
+        background: linear-gradient(45deg, var(--job-highlight), #ff8a50);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+    }
+
+    .improve-header p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+    }
+
+    .improve-form {
+        background: var(--secondary-bg);
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .improve-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--job-highlight), #ff8a50);
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--job-highlight);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-icon {
+        width: 20px;
+        height: 20px;
+        fill: var(--job-highlight);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-family: 'Rajdhani', sans-serif;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .form-select:focus {
+        border-color: var(--job-highlight);
+        box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+    }
+
+    .form-select option {
+        background: var(--secondary-bg);
+        color: var(--text-primary);
+        padding: 0.5rem;
+    }
+
+    .form-textarea {
+        width: 100%;
+        min-height: 200px;
+        padding: 1rem;
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-family: 'Rajdhani', sans-serif;
+        outline: none;
+        transition: all 0.3s ease;
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+    .form-textarea:focus {
+        border-color: var(--job-highlight);
+        box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+    }
+
+    .form-textarea::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .analyze-btn {
+        width: 100%;
+        padding: 1.2rem;
+        background: linear-gradient(45deg, var(--job-highlight), #ff8a50);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        font-family: 'Rajdhani', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .analyze-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(255, 107, 53, 0.6);
+    }
+
+    .analyze-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-icon {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+    }
+
+    .info-box {
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-box h3 {
+        color: var(--job-highlight);
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-list li {
+        padding: 0.5rem 0;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .info-list li::before {
+        content: "▸";
+        color: var(--job-highlight);
+        font-weight: bold;
+        margin-top: 0.1rem;
+    }
+
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loading-content {
+        text-align: center;
+        color: var(--text-primary);
+        background: var(--secondary-bg);
+        padding: 2rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 107, 53, 0.3);
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 107, 53, 0.3);
+        border-top: 3px solid var(--job-highlight);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .no-profiles {
+        text-align: center;
+        padding: 3rem;
+        background: var(--secondary-bg);
+        border: 1px solid rgba(255, 107, 53, 0.2);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .no-profiles h3 {
+        color: var(--job-highlight);
+        margin-bottom: 1rem;
+    }
+
+    .no-profiles p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+    }
+
+    .create-profile-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .create-profile-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
+        text-decoration: none;
+        color: white;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .improve-container {
+            padding: 1rem 0.5rem;
+        }
+        
+        .improve-form {
+            padding: 1.5rem;
+        }
+        
+        .improve-header h1 {
+            font-size: 2rem;
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .improve-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .analyze-btn {
+            padding: 1rem;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<div class="improve-container">
+    <div class="improve-header">
+        <h1>AI Resume Optimizer</h1>
+        <p>Analyze your profile against job descriptions and get AI-powered improvement recommendations</p>
+    </div>
+
+    <div class="info-box">
+        <h3>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            How It Works
+        </h3>
+        <ul class="info-list">
+            <li>Select one of your existing profiles to analyze</li>
+            <li>Paste the job description you're targeting</li>
+            <li>Get AI-powered analysis of your profile's match score</li>
+            <li>Receive specific, actionable improvement recommendations</li>
+            <li>Apply improvements directly to your profile with one click</li>
+        </ul>
+    </div>
+
+    {% if profiles %}
+        <form method="POST" class="improve-form" id="improveForm">
+            <div class="form-section">
+                <h3 class="section-title">
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Select Your Profile
+                </h3>
+                
+                <div class="form-group">
+                    <label for="profile_id" class="form-label">Choose Profile to Analyze</label>
+                    <select name="profile_id" id="profile_id" class="form-select" required>
+                        <option value="">-- Select a Profile --</option>
+                        {% for profile in profiles %}
+                            <option value="{{ profile.id }}">
+                                {{ profile.title or profile.name or profile.resume_filename or 'Unnamed Profile' }}
+                                {% if profile.headline %} - {{ profile.headline }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Target Job Description
+                </h3>
+                
+                <div class="form-group">
+                    <label for="job_description" class="form-label">Paste Job Description</label>
+                    <textarea 
+                        name="job_description" 
+                        id="job_description" 
+                        class="form-textarea" 
+                        placeholder="Paste the complete job description here. Include job title, requirements, responsibilities, qualifications, and any other relevant details..."
+                        required
+                    ></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="analyze-btn" id="analyzeBtn">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Analyze & Get Improvements
+            </button>
+        </form>
+    {% else %}
+        <div class="no-profiles">
+            <h3>No Profiles Found</h3>
+            <p>You need to create a profile before you can analyze and improve it.</p>
+            <a href="{{ url_for('main.add_profile') }}" class="create-profile-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Create Your First Profile
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <h3>Analyzing Your Profile...</h3>
+        <p>AI is analyzing your profile against the job requirements</p>
+        <p><small>This may take up to 30 seconds</small></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('improveForm');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Show loading overlay
+                loadingOverlay.style.display = 'flex';
+                analyzeBtn.disabled = true;
+                analyzeBtn.innerHTML = `
+                    <div style="width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    Analyzing...
+                `;
+            });
+        }
+
+        // Check for pre-filled job description from job detail page
+        const prefilledJobDescription = sessionStorage.getItem('jobDescriptionForImprovement');
+        const prefilledJobTitle = sessionStorage.getItem('jobTitleForImprovement');
+        const autoImproveAndApply = sessionStorage.getItem('autoImproveAndApply');
+        
+        const textarea = document.getElementById('job_description');
+        if (textarea) {
+            // Auto-fill if coming from job detail page
+            if (prefilledJobDescription) {
+                textarea.value = prefilledJobDescription;
+                
+                // Show a helpful message
+                if (prefilledJobTitle) {
+                    const headerElement = document.querySelector('.improve-header p');
+                    if (headerElement) {
+                        headerElement.innerHTML = `Analyzing your profile for: <strong style="color: var(--job-highlight);">${prefilledJobTitle}</strong>`;
+                    }
+                }
+                
+                // Auto-resize to fit content
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.max(200, textarea.scrollHeight) + 'px';
+                
+                // Add visual feedback
+                textarea.style.borderColor = 'rgba(255, 107, 53, 0.6)';
+                textarea.style.backgroundColor = 'rgba(255, 107, 53, 0.05)';
+                
+                // If auto-improve is triggered, automatically submit the form
+                if (autoImproveAndApply === 'true') {
+                    // Get the profile select element
+                    const profileSelect = document.getElementById('profile_id');
+                    if (profileSelect && profileSelect.options.length > 1) {
+                        // Select the first available profile (index 1, since 0 is the default option)
+                        profileSelect.selectedIndex = 1;
+                        profileSelect.style.borderColor = 'rgba(255, 107, 53, 0.6)';
+                        
+                        // Show loading state
+                        const submitButton = document.getElementById('analyzeBtn');
+                        if (submitButton) {
+                            submitButton.innerHTML = '<div style="width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div> Auto-Improving Resume...';
+                            submitButton.disabled = true;
+                        }
+                        
+                        // Auto-submit the form after a brief delay for better UX
+                        setTimeout(() => {
+                            if (form) {
+                                // Show loading overlay just like manual submit
+                                if (typeof loadingOverlay !== 'undefined' && loadingOverlay) {
+                                    loadingOverlay.style.display = 'flex';
+                                }
+                                // Trigger native submit handler so existing logic runs
+                                if (typeof form.requestSubmit === 'function') {
+                                    form.requestSubmit();
+                                } else {
+                                    form.submit();
+                                }
+                            }
+                        }, 1500);
+                    }
+                    
+                    // Clear the auto-improve flag
+                    sessionStorage.removeItem('autoImproveAndApply');
+                }
+                
+                // Clear job description only if not auto-improving (keep for potential retry)
+                if (autoImproveAndApply !== 'true') {
+                    sessionStorage.removeItem('jobDescriptionForImprovement');
+                    sessionStorage.removeItem('jobTitleForImprovement');
+                }
+            }
+            
+            // Auto-resize functionality
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.max(200, this.scrollHeight) + 'px';
+            });
+        }
+
+        // Profile selection feedback
+        const profileSelect = document.getElementById('profile_id');
+        if (profileSelect) {
+            profileSelect.addEventListener('change', function() {
+                if (this.value) {
+                    this.style.borderColor = 'rgba(255, 107, 53, 0.6)';
+                } else {
+                    this.style.borderColor = 'rgba(255, 107, 53, 0.3)';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

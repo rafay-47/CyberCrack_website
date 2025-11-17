@@ -1,0 +1,643 @@
+{% extends "job_base.html" %}
+
+{% block title %}Batch Results - CyberCrack{% endblock %}
+
+{% block breadcrumb_current %}Batch Results{% endblock %}
+
+{% block content %}
+<style>
+    .results-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .results-header {
+        background: var(--secondary-bg);
+        border: 1px solid rgba(0,180,216,0.12);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .results-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+    }
+
+    .results-header h2 {
+        font-size: 2rem;
+        background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    .batch-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-card {
+        background: var(--secondary-bg);
+        border: 1px solid rgba(0,180,216,0.12);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .summary-card h3 {
+        color: var(--neon-blue);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-card .value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-card .label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .job-results {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .job-result-card {
+        background: var(--secondary-bg);
+        border: 1px solid rgba(0,180,216,0.12);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .job-result-card:hover {
+        border-color: rgba(0,180,216,0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.1);
+    }
+
+    .job-result-card.success {
+        border-color: rgba(0, 255, 157, 0.3);
+    }
+
+    .job-result-card.error {
+        border-color: rgba(255, 107, 107, 0.3);
+    }
+
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .job-title-section {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .job-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--neon-blue);
+        margin-bottom: 0.5rem;
+        display: block;
+        text-decoration: none;
+    }
+
+    .job-title:hover {
+        color: var(--neon-green);
+        text-decoration: underline;
+    }
+
+    .job-company {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .job-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+    }
+
+    .job-status.success {
+        background: rgba(0, 255, 157, 0.1);
+        color: var(--neon-green);
+        border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
+    .job-status.error {
+        background: rgba(255, 107, 107, 0.1);
+        color: var(--neon-red);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .job-analysis {
+        margin-bottom: 1rem;
+    }
+
+    .analysis-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .analysis-item {
+        text-align: center;
+    }
+
+    .analysis-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--neon-green);
+        display: block;
+    }
+
+    .analysis-label {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .job-summary {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .job-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 255, 157, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+
+    .action-btn.secondary {
+        background: rgba(0, 180, 216, 0.1);
+        color: var(--neon-blue);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+    }
+
+    .action-btn.secondary:hover {
+        background: rgba(0, 180, 216, 0.2);
+        color: var(--neon-blue);
+    }
+
+    .error-message {
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .error-message h4 {
+        color: var(--neon-red);
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .error-message p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .back-to-apply {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(0,180,216,0.1);
+    }
+
+    .back-btn {
+        background: rgba(0, 180, 216, 0.1);
+        color: var(--neon-blue);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: rgba(0, 180, 216, 0.2);
+        transform: translateY(-1px);
+        text-decoration: none;
+        color: var(--neon-blue);
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        background: var(--secondary-bg);
+        border: 1px solid rgba(0,180,216,0.12);
+        border-radius: 12px;
+        margin-top: 2rem;
+    }
+
+    .no-results h3 {
+        color: var(--neon-blue);
+        margin-bottom: 1rem;
+    }
+
+    .no-results p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    /* Extension Integration Styles */
+    .extension-actions {
+        text-align: center;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: rgba(0, 180, 216, 0.05);
+        border: 1px solid rgba(0, 180, 216, 0.15);
+        border-radius: 12px;
+    }
+
+    .send-to-extension-btn {
+        background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .send-to-extension-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
+        color: white;
+    }
+
+    .send-to-extension-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .extension-status {
+        margin-top: 1rem;
+        padding: 0.5rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        display: none;
+    }
+
+    .extension-status.success {
+        background: rgba(0, 255, 157, 0.1);
+        color: var(--neon-green);
+        border: 1px solid rgba(0, 255, 157, 0.3);
+    }
+
+    .extension-status.error {
+        background: rgba(255, 107, 107, 0.1);
+        color: var(--neon-red);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .results-container {
+            padding: 0 0.5rem;
+        }
+
+        .batch-summary {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .job-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .job-actions {
+            justify-content: center;
+        }
+
+        .analysis-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="results-container">
+    <!-- Header -->
+    <div class="results-header">
+        <h2>Batch Application Results</h2>
+        <p>Review the results of your job applications</p>
+    </div>
+
+    {% if results %}
+        <!-- Batch Summary -->
+        <div class="batch-summary">
+            <div class="summary-card">
+                <h3>{{ results.total_jobs }}</h3>
+                <div class="value">{{ results.total_jobs }}</div>
+                <div class="label">Total Jobs</div>
+            </div>
+            <div class="summary-card">
+                <h3>{{ results.successful_jobs }}</h3>
+                <div class="value">{{ results.successful_jobs }}</div>
+                <div class="label">Successful</div>
+            </div>
+            <div class="summary-card">
+                <h3>{{ results.failed_jobs }}</h3>
+                <div class="value">{{ results.failed_jobs }}</div>
+                <div class="label">Failed</div>
+            </div>
+            <div class="summary-card">
+                <h3>{{ results.processed_jobs }}</h3>
+                <div class="value">{{ results.processed_jobs }}</div>
+                <div class="label">Processed</div>
+            </div>
+        </div>
+
+        <!-- Extension Integration -->
+        <div class="extension-actions">
+            <h4 style="color: var(--neon-blue); margin-bottom: 1rem;">Send Data to Autofill Extension</h4>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Send your job application data to the CyberCrack Autofill extension for automatic form filling.
+                <br><small>
+                    <a href="{{ url_for('main.debug_batch_data') }}" style="color: var(--neon-blue);">🔍 Debug: View formatted data</a> | 
+                    <a href="{{ url_for('main.get_raw_batch_data') }}" style="color: var(--neon-blue);">📋 Raw API data</a> | 
+                    <a href="{{ url_for('main.get_batch_results_data') }}" style="color: var(--neon-blue);">🔌 Extension API</a>
+                </small>
+            </p>
+            <button id="sendToExtensionBtn" class="send-to-extension-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                </svg>
+                Send to Extension
+            </button>
+            <button id="downloadDataBtn" class="send-to-extension-btn" style="margin-left: 1rem; background: rgba(0, 180, 216, 0.2); border: 1px solid rgba(0, 180, 216, 0.5);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                Download Data
+            </button>
+            <div id="extensionStatus" class="extension-status"></div>
+        </div>
+
+        <!-- Job Results -->
+        <div class="job-results">
+            {% for job_result in results.job_results %}
+            <div class="job-result-card {{ 'success' if job_result.status == 'success' else 'error' }}">
+                <div class="job-header">
+                    <div class="job-title-section">
+                        {% if job_result.job_url %}
+                            <a href="{{ job_result.job_url }}" target="_blank" class="job-title">
+                                {{ job_result.job_title }}
+                            </a>
+                        {% else %}
+                            <div class="job-title">{{ job_result.job_title }}</div>
+                        {% endif %}
+                        <div class="job-company">
+                            {% if job_result.company %}{{ job_result.company }}{% endif %}
+                        </div>
+                    </div>
+                    <div class="job-status {{ job_result.status }}">
+                        {% if job_result.status == 'success' %}
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+                            </svg>
+                            Success
+                        {% else %}
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19,6.41L17.59,5L12,10.59L8.41,7L7,8.41L12,13.41L19,6.41Z"/>
+                            </svg>
+                            Failed
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if job_result.status == 'success' %}
+                    <!-- Analysis Summary -->
+                    <div class="job-analysis">
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="analysis-value">{{ "%.1f"|format(job_result.analysis.overall_match_score * 100) }}%</span>
+                                <div class="analysis-label">Match Score</div>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-value">{{ job_result.analysis.missing_skills|length }}</span>
+                                <div class="analysis-label">Missing Skills</div>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-value">{{ job_result.analysis.keyword_gaps|length }}</span>
+                                <div class="analysis-label">Keyword Gaps</div>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="analysis-value">{{ job_result.improvements_count }}</span>
+                                <div class="analysis-label">Improvements</div>
+                            </div>
+                        </div>
+
+                        {% if job_result.analysis.summary %}
+                        <div class="job-summary">
+                            {{ job_result.analysis.summary }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="job-actions">
+                        <a href="{{ url_for('main.download_improved_resume', batch_id=results.batch_id, job_id=job_result.job_id) }}" class="action-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                            </svg>
+                            Download Resume
+                        </a>
+                        {% if job_result.job_url %}
+                        <a href="{{ job_result.job_url }}" target="_blank" class="action-btn secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                            </svg>
+                            View Job
+                        </a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <!-- Error Message -->
+                    <div class="error-message">
+                        <h4>Processing Failed</h4>
+                        <p>{{ job_result.error or 'Unknown error occurred during processing' }}</p>
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results">
+            <h3>No Results Found</h3>
+            <p>Unable to load batch results. The results may have expired or been deleted.</p>
+        </div>
+    {% endif %}
+
+    <!-- Back to Apply -->
+    <div class="back-to-apply">
+        <a href="{{ url_for('main.jobs_list') }}" class="back-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+            </svg>
+            Apply to More Jobs
+        </a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sendBtn = document.getElementById('sendToExtensionBtn');
+    const downloadBtn = document.getElementById('downloadDataBtn');
+    const statusDiv = document.getElementById('extensionStatus');
+
+    if (sendBtn) {
+        sendBtn.addEventListener('click', async function() {
+            try {
+                // Disable button during processing
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"><animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>Sending...';
+                
+                // Fetch batch results data from API
+                const response = await fetch('/api/batch_results_data');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const batchData = await response.json();
+                
+                // Store data in localStorage for extension to pick up
+                localStorage.setItem('cybercrack_batch_data', JSON.stringify({
+                    data: batchData,
+                    timestamp: new Date().toISOString()
+                }));
+                
+                showStatus('success', 'Data saved! The CyberCrack extension will automatically sync this data when you visit job sites.');
+                
+            } catch (error) {
+                console.error('Error sending data to extension:', error);
+                showStatus('error', 'Failed to send data. Please try again.');
+            } finally {
+                // Re-enable button
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/></svg>Send to Extension';
+            }
+        });
+    }
+
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/batch_results_data');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const batchData = await response.json();
+                
+                // Create downloadable JSON file
+                const dataStr = JSON.stringify(batchData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `cybercrack-job-data-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                showStatus('success', 'Job data downloaded successfully!');
+                
+            } catch (error) {
+                console.error('Error downloading data:', error);
+                showStatus('error', 'Failed to download data. Please try again.');
+            }
+        });
+    }
+
+    function showStatus(type, message) {
+        statusDiv.className = `extension-status ${type}`;
+        statusDiv.textContent = message;
+        statusDiv.style.display = 'block';
+        
+        // Hide status after 5 seconds
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    }
+});
+</script>
+
+{% endblock %}

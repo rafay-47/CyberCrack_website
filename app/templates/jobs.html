@@ -1,6 +1,9 @@
-{% extends "base.html" %}
+{% extends "job_base.html" %}
 
-{% block title %}Job Scraper - CyberCrack{% endblock %}
+{% block title %}Job Search - CyberCrack{% endblock %}
+
+{% block breadcrumb_current %}Job Search{% endblock %}
+
 
 {% block content %}
 <style>
@@ -1140,6 +1143,10 @@
                                     <span>{{ p.title }}</span>
                                 </label>
                             {% endfor %}
+                        {% else %}
+                            <div class="dropdown-item no-profiles">
+                                <span style="color: var(--text-secondary); font-style: italic;">No profiles found</span>
+                            </div>
                         {% endif %}
                         <div class="dropdown-divider"></div>
                         <a href="{{ url_for('main.add_profile') }}" class="dropdown-item add-profile-item">
@@ -1201,6 +1208,17 @@
                                 <option value="remote">Remote</option>
                                 <option value="onsite">On-site</option>
                                 <option value="hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                        <div class="filter-section">
+                            <label class="filter-label">Hours Old</label>
+                            <select class="filter-select" name="hours_old">
+                                <option value="">No filter</option>
+                                <option value="1">1 hour</option>
+                                <option value="12">12 hours</option>
+                                <option value="24">1 day</option>
+                                <option value="168">1 week</option>
+                                <option value="720">1 month</option>
                             </select>
                         </div>
                     </div>
@@ -1444,6 +1462,25 @@
     });
 
     form.addEventListener('submit', function(e) {
+        // Check if profile is selected
+        const selectedProfile = document.querySelector('input[name="profile"]:checked');
+        if (!selectedProfile) {
+            e.preventDefault();
+            alert('Please select a profile before searching for jobs. If you don\'t have any profiles, click "Add New Profile" to create one.');
+            // Scroll to profile dropdown
+            const profileBtn = document.getElementById('profileBtn');
+            if (profileBtn) {
+                profileBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                profileBtn.style.borderColor = '#ff6b6b';
+                profileBtn.style.boxShadow = '0 0 0 2px rgba(255, 107, 107, 0.2)';
+                setTimeout(() => {
+                    profileBtn.style.borderColor = '';
+                    profileBtn.style.boxShadow = '';
+                }, 3000);
+            }
+            return;
+        }
+
         // Show loading overlay
         loadingOverlay.style.display = 'flex';
         submitBtn.disabled = true;

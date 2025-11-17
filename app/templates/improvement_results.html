@@ -1,0 +1,1060 @@
+{% extends "job_base.html" %}
+
+{% block title %}Profile Improvement Results - CyberCrack Jobs{% endblock %}
+
+{% block breadcrumb_current %}Improvement Results{% endblock %}
+
+{% block content %}
+<style>
+    .results-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .results-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .results-header h1 {
+        font-size: 2.5rem;
+        font-family: 'Orbitron', sans-serif;
+        background: linear-gradient(45deg, var(--job-highlight), #ff8a50);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .analysis-card {
+        background: var(--secondary-bg);
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .analysis-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--job-highlight), #ff8a50);
+    }
+
+    .card-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--job-highlight);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .card-icon {
+        width: 24px;
+        height: 24px;
+        fill: var(--job-highlight);
+    }
+
+    .match-score {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(var(--job-highlight) 0deg, var(--job-highlight) var(--score-angle), rgba(255, 107, 53, 0.2) var(--score-angle), rgba(255, 107, 53, 0.2) 360deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        position: relative;
+    }
+
+    .score-circle::before {
+        content: '';
+        width: 90px;
+        height: 90px;
+        background: var(--secondary-bg);
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .score-text {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--job-highlight);
+        z-index: 1;
+    }
+
+    .score-label {
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-item {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 107, 53, 0.2);
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--job-highlight);
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .skills-section {
+        margin-bottom: 2rem;
+    }
+
+    .skills-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .skills-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .skill-tag {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid;
+    }
+
+    .skill-missing {
+        background: rgba(255, 107, 53, 0.15);
+        border-color: rgba(255, 107, 53, 0.4);
+        color: var(--job-highlight);
+    }
+
+    .improvements-section {
+        grid-column: 1 / -1;
+        background: var(--secondary-bg);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .improvements-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+    }
+
+    .improvements-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .improvements-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--neon-blue);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .apply-all-btn {
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .apply-all-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 255, 157, 0.4);
+    }
+
+    .improvements-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .improvement-item {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(0, 180, 216, 0.2);
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .improvement-item:hover {
+        border-color: rgba(0, 180, 216, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .improvement-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .improvement-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .improvement-meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .priority-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .priority-high {
+        background: rgba(255, 107, 53, 0.2);
+        color: var(--job-highlight);
+        border: 1px solid rgba(255, 107, 53, 0.4);
+    }
+
+    .priority-medium {
+        background: rgba(255, 165, 0, 0.2);
+        color: #ffa500;
+        border: 1px solid rgba(255, 165, 0, 0.4);
+    }
+
+    .priority-low {
+        background: rgba(0, 180, 216, 0.2);
+        color: var(--neon-blue);
+        border: 1px solid rgba(0, 180, 216, 0.4);
+    }
+
+    .impact-score {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .improvement-description {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .improvement-suggestion {
+        background: rgba(0, 180, 216, 0.1);
+        border: 1px solid rgba(0, 180, 216, 0.3);
+        border-radius: 6px;
+        padding: 1rem;
+        color: var(--text-primary);
+        line-height: 1.5;
+        font-style: italic;
+        margin-bottom: 1rem;
+    }
+
+    .improvement-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .improvement-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--neon-blue);
+        cursor: pointer;
+    }
+
+    .improvement-checkbox label {
+        color: var(--text-primary);
+        font-weight: 500;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 3rem;
+    }
+
+    .btn {
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, var(--neon-blue), var(--accent));
+        color: white;
+    }
+
+    .btn-secondary {
+        background: rgba(0, 180, 216, 0.2);
+        color: var(--neon-blue);
+        border: 1px solid rgba(0, 180, 216, 0.4);
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(0, 180, 216, 0.3);
+        color: var(--neon-blue);
+    }
+
+    .summary-section {
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-text {
+        color: var(--text-primary);
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .results-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .results-container {
+            padding: 1rem 0.5rem;
+        }
+        
+        .analysis-card {
+            padding: 1.5rem;
+        }
+        
+        .improvements-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+        
+        .improvement-header {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .improvement-meta {
+            justify-content: flex-start;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .results-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .score-circle {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .score-circle::before {
+            width: 75px;
+            height: 75px;
+        }
+        
+        .score-text {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Preview Styles */
+    .preview-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .changes-summary {
+        background: rgba(0, 255, 157, 0.1);
+        border: 1px solid rgba(0, 255, 157, 0.3);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .changes-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .change-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(0, 255, 157, 0.15);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        color: var(--neon-green);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .profile-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .preview-section {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(0, 180, 216, 0.2);
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .preview-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--neon-blue);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .preview-content {
+        color: var(--text-primary);
+        line-height: 1.6;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-item {
+        color: var(--text-secondary);
+    }
+
+    .info-item strong {
+        color: var(--text-primary);
+    }
+
+    .headline-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0, 180, 216, 0.1);
+    }
+
+    .headline-text {
+        margin-top: 0.5rem;
+        font-style: italic;
+        color: var(--neon-blue);
+        font-weight: 500;
+    }
+
+    .summary-content {
+        background: rgba(0, 180, 216, 0.05);
+        padding: 1rem;
+        border-radius: 6px;
+        border-left: 3px solid var(--neon-blue);
+    }
+
+    .skill-new {
+        background: linear-gradient(90deg, rgba(255, 107, 53, 0.2), rgba(255, 140, 80, 0.1));
+        border-color: var(--job-highlight);
+        color: var(--job-highlight);
+        font-weight: 600;
+    }
+
+    .experience-item {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 180, 216, 0.1);
+    }
+
+    .experience-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .exp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+        gap: 1rem;
+    }
+
+    .exp-dates {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .exp-description {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+    }
+
+    .education-item {
+        margin-bottom: 1rem;
+    }
+
+    .edu-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.25rem;
+    }
+
+    .edu-dates {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .edu-school {
+        color: var(--text-secondary);
+        font-style: italic;
+    }
+
+    .recommendations-section {
+        border-top: 1px solid rgba(0, 180, 216, 0.1);
+        padding-top: 2rem;
+    }
+</style>
+
+<div class="results-container">
+    <div class="results-header">
+        <h1>Profile Analysis Results</h1>
+        <p>AI-powered analysis of your profile against the target job</p>
+    </div>
+
+    <div class="results-grid">
+        <!-- Match Score Card -->
+        <div class="analysis-card">
+            <h2 class="card-title">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Overall Match Score
+            </h2>
+            
+            <div class="match-score">
+                <div class="score-circle" style="--score-angle: {{ (analysis.overall_match_score * 360)|round }}deg;">
+                    <span class="score-text">{{ (analysis.overall_match_score * 100)|round }}%</span>
+                </div>
+                <div class="score-label">Profile-Job Compatibility</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">{{ analysis.missing_skills|length }}</span>
+                    <div class="stat-label">Missing Skills</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ analysis.keyword_gaps|length }}</span>
+                    <div class="stat-label">Keyword Gaps</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ analysis.industry_alignment|title }}</span>
+                    <div class="stat-label">Industry Alignment</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ analysis.experience_level_match|title }}</span>
+                    <div class="stat-label">Experience Match</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills Analysis Card -->
+        <div class="analysis-card">
+            <h2 class="card-title">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Skills Analysis
+            </h2>
+
+            {% if analysis.missing_skills %}
+                <div class="skills-section">
+                    <h3 class="skills-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Missing Skills ({{ analysis.missing_skills|length }})
+                    </h3>
+                    <div class="skills-grid">
+                        {% for skill in analysis.missing_skills[:8] %}
+                            <span class="skill-tag skill-missing">{{ skill }}</span>
+                        {% endfor %}
+                        {% if analysis.missing_skills|length > 8 %}
+                            <span class="skill-tag skill-missing">+{{ analysis.missing_skills|length - 8 }} more</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if analysis.keyword_gaps %}
+                <div class="skills-section">
+                    <h3 class="skills-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V18C2 18.5304 2.21071 19.0391 2.58579 19.4142C2.96086 19.7893 3.46957 20 4 20H16C16.5304 20 17.0391 19.7893 17.4142 19.4142C17.7893 19.0391 18 18.5304 18 18V13M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89783 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Important Keywords ({{ analysis.keyword_gaps|length }})
+                    </h3>
+                    <div class="skills-grid">
+                        {% for keyword in analysis.keyword_gaps[:6] %}
+                            <span class="skill-tag skill-missing">{{ keyword }}</span>
+                        {% endfor %}
+                        {% if analysis.keyword_gaps|length > 6 %}
+                            <span class="skill-tag skill-missing">+{{ analysis.keyword_gaps|length - 6 }} more</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- AI Summary -->
+        {% if analysis.summary %}
+        <div class="analysis-card" style="grid-column: 1 / -1;">
+            <h2 class="card-title">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                AI Analysis Summary
+            </h2>
+            <div class="summary-section">
+                <p class="summary-text">{{ analysis.summary }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Improved Profile Preview -->
+        <div class="improvements-section">
+            <div class="improvements-header">
+                <h2 class="improvements-title">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z"/>
+                    </svg>
+                    Improved Profile Preview
+                </h2>
+                <div class="preview-actions">
+                    <button type="button" class="apply-all-btn apply-with-resume-btn" onclick="applyWithImprovedResume()" style="background: linear-gradient(45deg, var(--neon-green), var(--neon-blue)); margin-right: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                        </svg>
+                        Apply with Improved Resume
+                    </button>
+                    <form method="POST" action="{{ url_for('main.generate_resume_pdf') }}" style="display: inline;" id="downloadForm">
+                        {% if improvement_token %}
+                        <input type="hidden" name="improvement_token" value="{{ improvement_token }}" />
+                        {% endif %}
+                        <button type="submit" class="apply-all-btn" id="downloadBtn" style="background: linear-gradient(45deg, var(--job-highlight), #ff8a50);">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor" stroke-width="2"/>
+                                <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Download Resume PDF
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Changes Applied Summary -->
+            {% if improved_profile.get('_changes_applied') %}
+                <div class="changes-summary">
+                    <h3 style="color: var(--neon-green); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        AI Improvements Applied
+                    </h3>
+                    <div class="changes-grid">
+                        {% for change in improved_profile._changes_applied %}
+                            <div class="change-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                {{ change }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Improved Profile Content -->
+            <div class="profile-preview">
+                <div class="preview-section">
+                    <h3 class="preview-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Personal Information
+                    </h3>
+                    <div class="preview-content">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <strong>Name:</strong> {{ improved_profile.get('name', 'Not specified') }}
+                            </div>
+                            <div class="info-item">
+                                <strong>Email:</strong> {{ improved_profile.get('email', 'Not specified') }}
+                            </div>
+                            <div class="info-item">
+                                <strong>Phone:</strong> {{ improved_profile.get('phone', 'Not specified') }}
+                            </div>
+                            <div class="info-item">
+                                <strong>Location:</strong> {{ improved_profile.get('location', 'Not specified') }}
+                            </div>
+                        </div>
+                        {% if improved_profile.get('headline') %}
+                            <div class="headline-section">
+                                <strong>Professional Headline:</strong>
+                                <div class="headline-text">{{ improved_profile.headline }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if improved_profile.get('summary') %}
+                <div class="preview-section">
+                    <h3 class="preview-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Professional Summary
+                    </h3>
+                    <div class="preview-content summary-content">
+                        {{ improved_profile.summary }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if improved_profile.get('skills') %}
+                <div class="preview-section">
+                    <h3 class="preview-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Skills ({{ improved_profile.skills|length }})
+                    </h3>
+                    <div class="preview-content">
+                        <div class="skills-grid">
+                            {% for skill in improved_profile.skills %}
+                                <span class="skill-tag {% if skill in (analysis.missing_skills or []) %}skill-new{% endif %}">
+                                    {% if skill in (analysis.missing_skills or []) %}⭐ {% endif %}{{ skill }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if improved_profile.get('work_experience') %}
+                <div class="preview-section">
+                    <h3 class="preview-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6H4L2 4H20L22 6V20C22 21.1046 21.1046 22 20 22H4C2.89543 22 2 21.1046 2 20V6C2 4.89543 2.89543 4 4 4H20C21.1046 4 22 4.89543 22 6Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Work Experience
+                    </h3>
+                    <div class="preview-content">
+                        {% for job in improved_profile.work_experience[:3] %}
+                            <div class="experience-item">
+                                <div class="exp-header">
+                                    <strong>{{ job.get('title', 'Position') }}</strong> at {{ job.get('company', 'Company') }}
+                                    <span class="exp-dates">({{ job.get('start', '') }} - {{ job.get('end', 'Present') }})</span>
+                                </div>
+                                {% if job.get('description') %}
+                                    <div class="exp-description">{{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif %}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if improved_profile.get('education') %}
+                <div class="preview-section">
+                    <h3 class="preview-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 10V6L12 2L2 6V10L12 14L22 10Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M6 12V16C6 17.1046 8.68629 18 12 18C15.3137 18 18 17.1046 18 16V12" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Education
+                    </h3>
+                    <div class="preview-content">
+                        {% for edu in improved_profile.education %}
+                            <div class="education-item">
+                                <div class="edu-header">
+                                    <strong>{{ edu.get('degree', 'Degree') }}</strong>
+                                    <span class="edu-dates">({{ edu.get('end', edu.get('start', '')) }})</span>
+                                </div>
+                                <div class="edu-school">{{ edu.get('school', 'Institution') }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if improvements %}
+                <div class="recommendations-section">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1rem; margin-top: 2rem;">
+                        Additional Improvement Suggestions
+                    </h3>
+                    <div class="improvements-list">
+                        {% for improvement in improvements %}
+                            <div class="improvement-item">
+                                <div class="improvement-header">
+                                    <div>
+                                        <h3 class="improvement-title">{{ improvement.title }}</h3>
+                                        <div class="improvement-meta">
+                                            <span class="priority-badge priority-{{ improvement.priority }}">
+                                                {{ improvement.priority }} Priority
+                                            </span>
+                                            <span class="impact-score">
+                                                Impact: {{ (improvement.impact_score * 100)|round }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <p class="improvement-description">{{ improvement.description }}</p>
+                                
+                                {% if improvement.suggestion %}
+                                    <div class="improvement-suggestion">
+                                        <strong>Suggestion:</strong> {{ improvement.suggestion }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <a href="{{ url_for('main.improve_profile') }}" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Analyze Another Profile
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                    <p>No specific improvements identified. Your profile appears to be well-optimized for this job!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add loading states for PDF generation and save profile
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function() {
+                const button = this.querySelector('button[type="submit"]');
+                if (button) {
+                    if (this.action.includes('generate_resume_pdf')) {
+                        button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"><animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/></circle></svg> Generating PDF...';
+                    } else if (this.action.includes('save_improved_profile')) {
+                        button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"><animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/></circle></svg> Saving...';
+                    }
+                    button.disabled = true;
+                }
+            });
+        });
+
+        // Highlight new skills with animation
+        const newSkills = document.querySelectorAll('.skill-new');
+        newSkills.forEach((skill, index) => {
+            skill.style.opacity = '0';
+            skill.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                skill.style.transition = 'all 0.3s ease';
+                skill.style.opacity = '1';
+                skill.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+        
+        // Add staggered animation to preview sections
+        const sections = document.querySelectorAll('.preview-section');
+        sections.forEach((section, index) => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                section.style.transition = 'all 0.4s ease';
+                section.style.opacity = '1';
+                section.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+    });
+    
+    function selectAllImprovements() {
+        const checkboxes = document.querySelectorAll('input[name="improvements"]');
+        const allSelected = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allSelected;
+        });
+        
+        // Update apply button
+        const applyBtn = document.getElementById('applyBtn');
+        if (applyBtn) {
+            applyBtn.disabled = allSelected;
+            applyBtn.style.opacity = allSelected ? '0.6' : '1';
+        }
+        
+        // Update button text
+        const selectAllBtn = document.querySelector('.apply-all-btn');
+        if (selectAllBtn) {
+            selectAllBtn.innerHTML = allSelected ? 
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2"/></svg>Deselect All' :
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2"/></svg>Select All';
+        }
+    }
+// Function to apply with improved resume
+function applyWithImprovedResume() {
+    const button = document.querySelector('.apply-with-resume-btn');
+    const jobApplicationUrl = sessionStorage.getItem('jobApplicationUrl');
+    
+    if (button) {
+        button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"><animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/></circle></svg> Opening Application...';
+        button.disabled = true;
+    }
+    
+    // Clear session storage
+    sessionStorage.removeItem('jobApplicationUrl');
+    sessionStorage.removeItem('jobDescriptionForImprovement');
+    sessionStorage.removeItem('jobTitleForImprovement');
+    
+    // Open job application in new tab or show completion message
+    if (jobApplicationUrl && jobApplicationUrl.trim() !== '') {
+        window.open(jobApplicationUrl, '_blank');
+        
+        // Show success message
+        setTimeout(() => {
+            alert('Your improved resume is ready! The job application page has been opened in a new tab. You can now apply with confidence using your enhanced profile.');
+            window.location.href = "{{ url_for('main.jobs') }}";
+        }, 1000);
+    } else {
+        alert('Perfect! Your resume has been improved and is ready for application. Contact the employer directly to apply with your enhanced profile.');
+        window.location.href = "{{ url_for('main.jobs') }}";
+    }
+}
+
+// Handle download form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadForm = document.getElementById('downloadForm');
+    const downloadBtn = document.getElementById('downloadBtn');
+    
+    if (downloadForm && downloadBtn) {
+        downloadForm.addEventListener('submit', function(e) {
+            // Show loading state
+            downloadBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"><animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/></circle></svg> Generating PDF...';
+            downloadBtn.disabled = true;
+            
+            // Let the form submit normally - don't prevent default
+            // The server will handle the PDF generation and download
+        });
+    }
+});
+</script>
+{% endblock %}

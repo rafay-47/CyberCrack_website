@@ -1,6 +1,9 @@
-{% extends "base.html" %}
+{% extends "job_base.html" %}
 
-{% block title %}Job Analysis - CyberCrack{% endblock %}
+{% block title %}Job Search - CyberCrack{% endblock %}
+
+{% block breadcrumb_current %}Job Search{% endblock %}
+
 
 {% block content %}
 <style>
@@ -639,12 +642,20 @@
             </div>
             
             <div class="job-actions">
-                {% if job.job_url %}
-                    <a href="{{ job.job_url }}" target="_blank" class="apply-btn">
+                {% set score = match.score or 0 %}
+                {% if score < 70 %}
+                    <button class="apply-btn improve-apply-btn" onclick="improveResumeAndApply()" style="background: linear-gradient(45deg, var(--job-highlight), #ff8a50);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z"/>
+                        </svg>
+                        Improve Resume & Apply
+                    </button>
+                {% else %}
+                    <a href="{{ job.job_url if job.job_url else '#' }}" target="_blank" class="apply-btn" {% if not job.job_url %}onclick="showApplyMessage(); return false;"{% endif %}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
                         </svg>
-                        View Original Job
+                        Apply Now
                     </a>
                 {% endif %}
                 <div class="job-site-badge">{{ job.site or 'Job Board' }}</div>
@@ -836,7 +847,7 @@
         {% endif %}
     </div>
 
-    <!-- Back Button -->
+    <!-- Navigation Back -->
     <div style="text-align: center; margin-top: 2rem;">
         <a href="{{ url_for('main.jobs_list') }}" class="apply-btn" style="background: rgba(0, 180, 216, 0.2); color: var(--neon-blue);">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -881,6 +892,99 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });
     });
+
+    // Function to automatically improve resume and prepare for application
+    window.improveResumeAndApply = function() {
+        // Show loading state
+        const button = document.querySelector('.improve-apply-btn');
+        if (button) {
+            button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416"><animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/></circle></svg> Improving Resume...';
+            button.disabled = true;
+        }
+        
+        // Get job data from DOM elements
+        const jobTitle = document.querySelector('.job-title').textContent.trim();
+        const jobCompany = document.querySelector('.job-company').textContent.trim();
+        const jobLocation = document.querySelector('.job-location').textContent.trim();
+        const jobDescription = document.querySelector('.job-description-content') ? 
+                              document.querySelector('.job-description-content').textContent.trim() : '';
+        
+        // Get metadata from job meta rows
+        let jobType = '';
+        let salaryInfo = '';
+        let datePosted = '';
+        
+        document.querySelectorAll('.job-meta-item').forEach(item => {
+            const label = item.querySelector('.job-meta-label').textContent.toLowerCase();
+            const value = item.querySelector('.job-meta-value').textContent.trim();
+            
+            if (label.includes('job type')) {
+                jobType = value;
+            } else if (label.includes('salary')) {
+                salaryInfo = value;
+            } else if (label.includes('posted')) {
+                datePosted = value;
+            }
+        });
+        
+        // Get skills from skills comparison section if available
+        let extractedSkills = [];
+        const skillTags = document.querySelectorAll('.skills-section .skill-tag');
+        skillTags.forEach(tag => {
+            const skillText = tag.textContent.replace('✓ ', '').trim();
+            if (skillText && !extractedSkills.includes(skillText)) {
+                extractedSkills.push(skillText);
+            }
+        });
+
+        // Create a comprehensive job description
+        let fullJobDescription = '';
+        
+        // Add job title and company
+        fullJobDescription += `Job Title: ${jobTitle}\n`;
+        fullJobDescription += `Company: ${jobCompany}\n`;
+        fullJobDescription += `Location: ${jobLocation}\n`;
+        
+        // Add job type and salary if available
+        if (jobType) {
+            fullJobDescription += `Job Type: ${jobType}\n`;
+        }
+        if (salaryInfo) {
+            fullJobDescription += `Salary: ${salaryInfo}\n`;
+        }
+        if (datePosted) {
+            fullJobDescription += `Posted: ${datePosted}\n`;
+        }
+        
+        fullJobDescription += '\n';
+        
+        // Add main job description
+        if (jobDescription) {
+            fullJobDescription += jobDescription;
+        }
+        
+        // Add extracted skills if available
+        if (extractedSkills.length > 0) {
+            fullJobDescription += '\n\nKey Skills/Technologies:\n';
+            extractedSkills.forEach(skill => {
+                fullJobDescription += `- ${skill}\n`;
+            });
+        }
+
+        // Store job info and trigger auto-improvement
+        sessionStorage.setItem('jobDescriptionForImprovement', fullJobDescription);
+        sessionStorage.setItem('jobTitleForImprovement', jobTitle);
+        sessionStorage.setItem('autoImproveAndApply', 'true');
+        sessionStorage.setItem('jobApplicationUrl', "{{ job.job_url or '' }}");
+        
+        // Navigate to improve profile page which will auto-process
+        window.location.href = "{{ url_for('main.improve_profile') }}";
+    };
+
+    // Function to show apply message when no job URL available
+    window.showApplyMessage = function() {
+        alert('Great! Your profile is well-matched for this job. Contact the employer through their preferred channels to apply.');
+    };
 });
 </script>
 

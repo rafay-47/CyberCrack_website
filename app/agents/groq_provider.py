@@ -30,7 +30,6 @@ class GroqProvider(Provider):
                 ],
                 **options,
             )
-            print("äpi",response.choices[0].message.content)
             return response.choices[0].message.content
         except Exception as e:
             logger.error(f"Groq generation error: {e}")

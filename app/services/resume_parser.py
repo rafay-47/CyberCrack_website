@@ -64,7 +64,6 @@ def parse_resume(path: str) -> dict:
     work_experience (list), education (list), projects (list), certifications (list), languages (list), links (list)
     """
     text, file_links = _read_text_from_file(path)
-    print("Links found in file metadata:", file_links)
     # Normalize and de-duplicate blank lines
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
     full_text = '\n'.join(lines)
