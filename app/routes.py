@@ -2631,10 +2631,10 @@ def init_cleanup_scheduler():
 @main_blueprint.route('/robots.txt')
 def robots_txt():
     """Serve robots.txt file for search engine crawlers"""
-    return send_from_directory('.', 'robots.txt')
+    return send_from_directory(current_app.root_path + '/..', 'robots.txt')
 
 
 @main_blueprint.route('/sitemap.xml')
 def sitemap_xml():
     """Serve sitemap.xml file for search engines"""
-    return send_from_directory('.', 'sitemap.xml')
+    return send_from_directory(current_app.root_path + '/..', 'sitemap.xml')
