@@ -2626,3 +2626,15 @@ def init_cleanup_scheduler():
     cleanup_thread = threading.Thread(target=periodic_cleanup, daemon=True)
     cleanup_thread.start()
     current_app.logger.info('Periodic cleanup thread started')
+
+
+@main_blueprint.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt file for search engine crawlers"""
+    return send_from_directory('.', 'robots.txt')
+
+
+@main_blueprint.route('/sitemap.xml')
+def sitemap_xml():
+    """Serve sitemap.xml file for search engines"""
+    return send_from_directory('.', 'sitemap.xml')
